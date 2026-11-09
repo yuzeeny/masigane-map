@@ -156,5 +156,6 @@
 {"id":"n1414586950","name":"이태원실비","area":"용산구","type":"기타","address":"서울 용산구 이태원로26길 29","naver":"https://map.naver.com/p/entry/place/1414586950","lat":37.533214,"lng":126.993795},
 {"id":"n1136070013","name":"올드빅","area":"용산구","type":"기타","address":"서울 용산구 신흥로 95-13","naver":"https://map.naver.com/p/entry/place/1136070013","lat":37.545205,"lng":126.985005},
 {"id":"n1840255296","name":"유유자적","area":"용산구","type":"기타","address":"서울 용산구 한강대로15길 12","naver":"https://map.naver.com/p/entry/place/1840255296","lat":37.526006,"lng":126.963851},
-{"id":"n1427135358","name":"맛자랑치킨","area":"강서구","type":"치킨","address":"서울 강서구 등촌동 78-7 길훈엔트런스빌 112호","naver":"https://map.naver.com/p/entry/place/1427135358","lat":37.560784,"lng":126.854618}
+{"id":"n1427135358","name":"맛자랑치킨","area":"강서구","type":"치킨","address":"서울 강서구 등촌동 78-7 길훈엔트런스빌 112호","naver":"https://map.naver.com/p/entry/place/1427135358","lat":37.560784,"lng":126.854618},
+{"id":"m-vinylhouse","name":"비닐하우스","area":"영등포구","type":"기타","address":"서울 영등포구 도림로128가길 13-8","lat":37.514238,"lng":126.897672}
 ]
