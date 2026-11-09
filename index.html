@@ -14,7 +14,7 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;height:100%;overflow:hidden;font-family:"IBM Plex Sans KR",system-ui,sans-serif;color:var(--ink);background:#EEF1EF}
 button,input{font-family:inherit}
-#map{position:fixed;inset:0}
+#map{position:fixed;inset:0;width:100%;height:100vh;height:100dvh}
 .mapmsg{position:fixed;inset:0;display:grid;place-items:center;text-align:center;color:var(--sub);font-size:15px;line-height:1.6;padding:24px}
 :focus-visible{outline:3px solid var(--green);outline-offset:2px}
 
@@ -242,9 +242,9 @@ function syncMarkers() {
     if (m.getMap() !== want) m.setMap(want);
   });
 }
-function fit() {
+function fit(list) {
   if (!map) return;
-  const vis = visible();
+  const vis = list || visible();
   if (!vis.length) return;
   if (vis.length === 1) { map.morph(new naver.maps.LatLng(vis[0].lat, vis[0].lng), 16); return; }
   const lats = vis.map(p => p.lat), lngs = vis.map(p => p.lng);
@@ -253,7 +253,7 @@ function fit() {
     wide ? { top: 40, right: 40, bottom: 40, left: 460 } : { top: 200, right: 30, bottom: window.innerHeight * 0.5, left: 30 });
 }
 function initialView() {
-  if (filter === "전체") { map.setCenter(new naver.maps.LatLng(37.548, 126.99)); map.setZoom(window.innerWidth >= 768 ? 13 : 12); } else fit();
+  fit(filter === "전체" && !query ? places.filter(p => p.area !== "서울 밖") : undefined);
 }
 
 window.initMap = function () {
