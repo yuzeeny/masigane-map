@@ -4,134 +4,154 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>마시가네 야장 지도</title>
-<meta name="description" content="오늘은 어디서 마시가? 마시가네(@masigane_masiga)가 다녀온 야장 지도">
+<meta name="description" content="마시가네(@masigane_masiga)가 다녀온 야장 지도">
 <meta property="og:title" content="마시가네 야장 지도">
-<meta property="og:description" content="오늘은 어디서 마시가? 🍻 @masigane_masiga">
+<meta property="og:description" content="마시가네가 다녀온 야장을 지도로 모았어요">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#0e1120;--panel:#171b2d;--panel2:#1f2439;--line:#2b3150;--text:#f4efe4;--muted:#8e94ae;--lantern:#ffb547;--red:#ff5d4f}
+:root{--ink:#0E1512;--sub:#3E4944;--mute:#8A948F;--line:#EBEEEC;--soft:#F2F4F3;--green:#0B7A50;--green-d:#08643F;--green-l:#E3F3EB;--pink:#D6245F}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;background:var(--bg);color:var(--text);font-family:"Noto Sans KR",system-ui,sans-serif}
-body{padding:calc(env(safe-area-inset-top) + 14px) 14px calc(env(safe-area-inset-bottom) + 40px)}
-.wrap{max-width:760px;margin:0 auto}
-header{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin-bottom:12px}
-h1{font-family:"Black Han Sans",sans-serif;font-weight:400;font-size:30px;line-height:1.05;margin:0}
-h1 .hl{color:var(--lantern);text-shadow:0 0 18px rgba(255,181,71,.45)}
-.sub{color:var(--muted);font-size:13px;margin-top:6px}
-.sub a{color:var(--muted)}
-.count{flex:none;background:var(--panel2);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:13px;color:var(--lantern);font-weight:700}
-.search{width:100%;background:var(--panel);border:1px solid var(--line);border-radius:12px;color:var(--text);padding:11px 14px;font-size:16px;font-family:inherit;margin-bottom:8px}
-.chips{display:flex;gap:6px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none}
+html,body{margin:0;height:100%;overflow:hidden;font-family:"IBM Plex Sans KR",system-ui,sans-serif;color:var(--ink);background:#EEF1EF}
+button,input{font-family:inherit}
+#map{position:fixed;inset:0}
+.mapmsg{position:fixed;inset:0;display:grid;place-items:center;text-align:center;color:var(--sub);font-size:15px;line-height:1.6;padding:24px}
+:focus-visible{outline:3px solid var(--green);outline-offset:2px}
+
+/* top */
+.top{position:fixed;left:14px;right:14px;top:calc(env(safe-area-inset-top) + 14px);z-index:20;display:flex;flex-direction:column;gap:10px;max-width:420px}
+.head{background:#fff;border-radius:16px;padding:14px 14px 14px 16px;box-shadow:0 2px 10px rgba(14,21,18,.12);display:flex;flex-direction:column;gap:10px}
+.head-row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+h1{margin:0;font-size:25px;font-weight:700;letter-spacing:-.8px;line-height:1.2}
+.follow{flex:none;height:40px;padding:0 14px 0 11px;border-radius:20px;background:var(--pink);color:#fff;text-decoration:none;font-size:14px;font-weight:700;display:flex;align-items:center;gap:6px}
+.search{display:flex;align-items:center;gap:10px;height:44px;padding:0 14px;border-radius:10px;background:var(--soft)}
+.search input{border:0;outline:none;background:transparent;flex:1;min-width:0;font-size:16px;font-weight:500;color:var(--ink)}
+.chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 -14px;padding:0 14px}
 .chips::-webkit-scrollbar{display:none}
-.chip{flex:none;border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:999px;padding:7px 13px;font-size:13px;cursor:pointer;font-family:inherit}
-.chip.on{background:var(--lantern);color:#1b1404;border-color:var(--lantern);font-weight:700}
-.mapbox{position:relative;height:58vh;min-height:340px;max-height:600px;border-radius:20px;overflow:hidden;border:1px solid var(--line);background:#1a1f33}
-#map{width:100%;height:100%}
-.mapmsg{position:absolute;inset:0;display:grid;place-items:center;text-align:center;color:var(--muted);font-size:14px;line-height:1.6;padding:20px}
+.chip{flex:none;height:38px;padding:0 15px;border-radius:19px;border:1px solid #C8D0CB;background:#fff;color:var(--ink);font-size:14px;font-weight:600;cursor:pointer}
+.chip.on{background:var(--ink);border-color:var(--ink);color:#fff;font-weight:700}
+
 /* markers */
-.mk{position:relative;width:34px;height:42px;cursor:pointer}
-.mk .b{position:absolute;left:0;top:0;width:34px;height:34px;border-radius:50% 50% 50% 4px;transform:rotate(-45deg);background:var(--lantern);border:2px solid #0e1120;box-shadow:0 2px 8px rgba(0,0,0,.35),0 0 12px rgba(255,181,71,.55)}
-.mk .e{position:absolute;left:0;top:0;width:34px;height:34px;display:grid;place-items:center;font-size:16px}
-.mk .l{position:absolute;top:40px;left:50%;transform:translateX(-50%);white-space:nowrap;font:700 11px "Noto Sans KR",sans-serif;color:#1b1404;background:#fff;border-radius:6px;padding:2px 6px;box-shadow:0 1px 4px rgba(0,0,0,.25);display:none}
-.show-labels .mk .l{display:block}
-.mk.sel .b{background:var(--red);box-shadow:0 2px 8px rgba(0,0,0,.35),0 0 16px rgba(255,93,79,.9)}
-.mk.sel .l{display:block;background:var(--red);color:#fff}
-.mk.temp .b{background:#7cf0c4}
-.selcard{position:absolute;left:10px;right:10px;bottom:10px;background:rgba(23,27,45,.97);border:1px solid var(--line);border-radius:16px;padding:14px;display:none;box-shadow:0 10px 30px rgba(0,0,0,.45);z-index:100}
-.selcard.show{display:block}
-.selcard .x{position:absolute;right:8px;top:6px;border:0;background:none;color:var(--muted);font-size:20px;cursor:pointer}
-.pname{font-weight:700;font-size:17px;padding-right:26px}
-.pmeta{color:var(--muted);font-size:12.5px;margin-top:3px}
-.pmemo{font-size:13.5px;margin-top:8px;line-height:1.5;white-space:pre-wrap}
-.btns{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
-.btn{display:inline-flex;align-items:center;gap:4px;border-radius:10px;padding:8px 12px;font-size:13px;font-weight:700;text-decoration:none;border:1px solid var(--line);background:var(--panel2);color:var(--text);cursor:pointer;font-family:inherit}
-.btn.naver{background:#03c75a;border-color:#03c75a;color:#fff}
-.btn.reel{background:linear-gradient(45deg,#f9a13a,#e1306c,#833ab4);border:0;color:#fff}
-.btn.primary{background:var(--lantern);border-color:var(--lantern);color:#1b1404}
-h2{font-size:15px;margin:22px 0 10px;color:var(--muted);font-weight:500}
-.list{display:grid;gap:8px}
-.item{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;gap:12px;align-items:center;cursor:pointer}
-.item.sel{border-color:var(--red)}
-.item .em{flex:none;width:40px;height:40px;border-radius:12px;background:var(--panel2);display:grid;place-items:center;font-size:20px}
-.item .t{min-width:0}
-.item .n{font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.item .m{color:var(--muted);font-size:12.5px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.empty{border:1px dashed var(--line);border-radius:14px;padding:22px;text-align:center;color:var(--muted);font-size:14px}
-footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:26px;line-height:1.6}
-/* admin helper (?admin) */
-.admin{display:none;margin-top:22px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px}
-body.is-admin .admin{display:block}
-.admin h3{margin:0 0 8px;font-size:15px}
-.admin p{color:var(--muted);font-size:12.5px;margin:0 0 10px;line-height:1.5}
-.admin label{display:block;font-size:12px;color:var(--muted);margin:10px 0 4px}
-.admin input,.admin select,.admin textarea{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--text);padding:10px 12px;font-size:16px;font-family:inherit}
-.admin textarea{min-height:60px}
-.admin pre{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px;font-size:12px;white-space:pre-wrap;word-break:break-all;color:#7cf0c4;min-height:40px}
-.row{display:flex;gap:8px}.row>*{flex:1}
-.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 24px);transform:translateX(-50%);background:#000c;color:#fff;padding:10px 16px;border-radius:999px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:200;white-space:nowrap}
+.mk{position:relative;cursor:pointer;display:flex;flex-direction:column;align-items:center}
+.mk .dot{width:18px;height:18px;border-radius:50%;background:var(--green);border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+.mk .lb{position:absolute;bottom:22px;white-space:nowrap;background:var(--ink);color:#fff;font:700 12px "IBM Plex Sans KR",sans-serif;padding:4px 8px;border-radius:7px;display:none}
+.show-labels .mk .lb{display:block;background:#fff;color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.mk.sel .dot{width:26px;height:26px;border-width:4px;box-shadow:0 2px 8px rgba(0,0,0,.35)}
+.mk.sel .lb{display:block;bottom:30px;background:var(--ink);color:#fff;font-size:13px;padding:5px 10px}
+.mk.temp .dot{background:var(--pink)}
+
+/* sheet */
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:30;background:#fff;border-radius:24px 24px 0 0;box-shadow:0 -6px 24px rgba(14,21,18,.14);display:flex;flex-direction:column;max-height:48vh;transition:max-height .25s ease}
+.sheet.min{max-height:96px}
+.grab{border:0;background:none;padding:10px 0 6px;width:100%;cursor:pointer;display:flex;justify-content:center;flex:none}
+.grab span{width:40px;height:5px;border-radius:3px;background:#C8D0CB}
+.sheet-body{overflow-y:auto;padding:0 20px calc(env(safe-area-inset-bottom) + 16px);-webkit-overflow-scrolling:touch}
+.detail{display:flex;flex-direction:column;gap:16px;padding-bottom:18px}
+.tag{align-self:flex-start;font-size:13px;font-weight:700;color:var(--green-d);background:var(--green-l);padding:4px 9px;border-radius:6px}
+.d-head{display:flex;flex-direction:column;gap:6px}
+.d-row{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+h2{margin:0;font-size:26px;font-weight:700;letter-spacing:-.6px;line-height:1.25}
+.addr{margin:0;font-size:15px;color:var(--sub)}
+.memo{margin:0;font-size:15px;line-height:1.6;white-space:pre-wrap}
+.close{flex:none;width:44px;height:44px;margin:-6px -10px 0 0;border:0;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.acts{display:flex;gap:8px}
+.btn{height:52px;border-radius:12px;font-size:16px;font-weight:700;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn.primary{flex:1;background:var(--green);color:#fff}
+.btn.line{flex:none;padding:0 18px;border:1.5px solid var(--ink);color:var(--ink)}
+.btn.reel{flex:none;padding:0 16px;background:#FBE4EC;color:#9C1440}
+.gap{height:8px;margin:0 -20px 16px;background:var(--soft)}
+h3{margin:0 0 4px;font-size:17px;font-weight:700}
+.list{display:flex;flex-direction:column}
+.row{display:flex;align-items:center;gap:12px;min-height:64px;width:100%;text-align:left;border:0;border-bottom:1px solid var(--line);background:none;padding:8px 0;cursor:pointer;color:var(--ink)}
+.row:last-child{border-bottom:0}
+.row .t{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.row .n{font-size:16px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .m{font-size:14px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .m b{color:var(--green-d);font-weight:600;margin-right:6px}
+.empty{padding:24px 0;text-align:center;color:var(--sub);font-size:15px}
+.foot{font-size:12px;color:var(--mute);text-align:center;padding:14px 0 4px}
+
+/* admin (?admin) */
+.admin{display:none;border-top:8px solid var(--soft);margin:12px -20px 0;padding:16px 20px 0}
+.is-admin .admin{display:block}
+.admin h4{margin:0 0 6px;font-size:16px}
+.admin p{margin:0 0 8px;font-size:13px;color:var(--sub);line-height:1.5}
+.admin label{display:block;font-size:13px;color:var(--sub);margin:10px 0 4px}
+.admin input,.admin select,.admin textarea{width:100%;border:1px solid #C8D0CB;border-radius:10px;padding:10px 12px;font-size:16px;font-family:inherit;color:var(--ink);background:#fff}
+.admin pre{background:var(--soft);border-radius:10px;padding:10px;font-size:12px;white-space:pre-wrap;word-break:break-all;min-height:40px}
+.admin .btn{margin-top:10px;width:100%;border:0;cursor:pointer}
+
+.toast{position:fixed;left:50%;bottom:calc(48vh + 12px);transform:translateX(-50%);background:rgba(14,21,18,.9);color:#fff;padding:10px 16px;border-radius:999px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:50;white-space:nowrap}
 .toast.show{opacity:1}
+
+@media (min-width:768px){
+  .sheet{left:14px;right:auto;bottom:14px;top:calc(env(safe-area-inset-top) + 220px);width:420px;max-height:none;border-radius:16px}
+  .sheet.min{max-height:none}
+  .grab{display:none}
+  .toast{bottom:24px}
+}
+@media (prefers-reduced-motion:reduce){.sheet{transition:none}}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <div>
-      <h1>마시가네 <span class="hl">야장</span> 지도</h1>
-      <div class="sub">오늘은 어디서 마시가? 🍻 <a href="https://www.instagram.com/masigane_masiga/" target="_blank" rel="noopener">@masigane_masiga</a></div>
+<div id="map"></div>
+<div class="mapmsg" id="mapmsg">지도를 불러오는 중이에요</div>
+
+<div class="top">
+  <div class="head">
+    <div class="head-row">
+      <h1>마시가네 야장 지도</h1>
+      <a class="follow" href="https://www.instagram.com/masigane_masiga/" target="_blank" rel="noopener" aria-label="마시가네 인스타그램 팔로우">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="5"/><circle cx="12" cy="12" r="3.6"/><circle cx="16.8" cy="7.2" r=".6" fill="#fff"/></svg>팔로우</a>
     </div>
-    <div class="count" id="count">0곳</div>
-  </header>
-
-  <input class="search" id="q" type="search" placeholder="가게 이름, 동네, 메뉴 검색">
-  <div class="chips" id="chips"></div>
-
-  <div class="mapbox" id="mapbox">
-    <div id="map"></div>
-    <div class="mapmsg" id="mapmsg">지도를 불러오는 중…</div>
-    <div class="selcard" id="selcard"></div>
+    <label class="search">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3E4944" stroke-width="2.2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+      <input id="q" type="search" placeholder="가게, 동네 검색" aria-label="야장 검색">
+    </label>
   </div>
-
-  <h2 id="listTitle">야장 목록</h2>
-  <div class="list" id="list"></div>
-
-  <section class="admin" id="admin">
-    <h3>🛠 야장 추가 도우미</h3>
-    <p>지도를 탭하면 위치가 찍혀요. 내용을 채우고 <b>JSON 복사</b>를 누른 뒤, <code>places.json</code> 배열 끝에 붙여 넣고 커밋하면 반영돼요.</p>
-    <div class="row">
-      <div><label>가게 이름</label><input id="a_name"></div>
-      <div><label>동네(필터명)</label><input id="a_area" placeholder="예) 중구"></div>
-    </div>
-    <div class="row">
-      <div><label>종류</label><select id="a_type"></select></div>
-      <div><label>대표 메뉴</label><input id="a_menu"></div>
-    </div>
-    <label>메모</label><textarea id="a_memo"></textarea>
-    <label>네이버지도 링크</label><input id="a_naver" placeholder="https://map.naver.com/p/entry/place/...">
-    <label>릴스 링크</label><input id="a_reel">
-    <label>위치</label><div class="pmeta" id="a_loc">지도를 탭하세요</div>
-    <label>결과</label><pre id="a_out"></pre>
-    <button class="btn primary" id="a_copy">JSON 복사</button>
-  </section>
-
-  <footer>지도 데이터 © NAVER Corp. · 길찾기는 각 가게의 ‘네이버지도’ 버튼을 눌러 주세요.</footer>
+  <div class="chips" id="chips"></div>
 </div>
-<div class="toast" id="toast"></div>
+
+<section class="sheet" id="sheet" aria-label="야장 목록">
+  <button class="grab" id="grab" aria-label="목록 펼치기 또는 접기"><span></span></button>
+  <div class="sheet-body" id="body">
+    <div id="detail"></div>
+    <h3 id="listTitle">야장 목록</h3>
+    <div class="list" id="list"></div>
+    <div class="foot">지도 데이터 © NAVER Corp.</div>
+
+    <section class="admin" id="admin">
+      <h4>야장 추가 도우미</h4>
+      <p>지도를 탭하면 위치가 찍혀요. 내용을 채우고 JSON을 복사해 places.json 배열 끝에 붙여 넣으면 반영돼요.</p>
+      <label for="a_name">가게 이름</label><input id="a_name">
+      <label for="a_area">구 (필터 이름)</label><input id="a_area" placeholder="예) 중구">
+      <label for="a_type">종류</label><select id="a_type"></select>
+      <label for="a_menu">대표 메뉴</label><input id="a_menu">
+      <label for="a_memo">한 줄 메모</label><textarea id="a_memo"></textarea>
+      <label for="a_naver">네이버지도 링크</label><input id="a_naver" placeholder="https://map.naver.com/p/entry/place/...">
+      <label for="a_reel">릴스 링크</label><input id="a_reel">
+      <label>위치</label><p id="a_loc">지도를 탭하세요</p>
+      <pre id="a_out"></pre>
+      <button class="btn primary" id="a_copy">JSON 복사</button>
+    </section>
+  </div>
+</section>
+<div class="toast" id="toast" role="status"></div>
 
 <script>
 /* ===== 설정 ===== */
-// 네이버 클라우드 플랫폼 > Maps > Application에서 발급받은 Client ID (ncpKeyId)
 const NCP_KEY_ID = "t2hlw513tp";
 const DATA_URL = "places.json";
 /* ================ */
 
-const TYPES = { "노가리·호프": "🍺", "포차": "🏮", "고기": "🥩", "해산물": "🦑", "전·막걸리": "🥞", "치킨": "🍗", "기타": "🍻" };
+const TYPES = ["노가리·호프", "포차", "고기", "해산물", "전·막걸리", "치킨", "기타"];
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const safeUrl = u => { try { const x = new URL(String(u || "").trim()); return /^https?:$/.test(x.protocol) ? x.href : ""; } catch { return ""; } };
 const placeNo = p => { const m = String(p.naver || "").match(/place\/(\d+)/); return m ? m[1] : ""; };
-const mapUrl = p => placeNo(p) ? `https://map.naver.com/p/entry/place/${placeNo(p)}` : "https://map.naver.com/p/search/" + encodeURIComponent(`${p.name} ${p.area || ""}`.trim());
-const naverUrl = p => placeNo(p) ? `https://m.place.naver.com/place/${placeNo(p)}/home` : (safeUrl(p.naver) || "https://m.search.naver.com/search.naver?query=" + encodeURIComponent(`${p.name} ${p.area || ""}`.trim()));
+const q2 = p => encodeURIComponent(`${p.name} ${p.area || ""}`.trim());
+const mapUrl = p => placeNo(p) ? `https://map.naver.com/p/entry/place/${placeNo(p)}` : "https://map.naver.com/p/search/" + q2(p);
+const infoUrl = p => placeNo(p) ? `https://m.place.naver.com/place/${placeNo(p)}/home` : (safeUrl(p.naver) || "https://m.search.naver.com/search.naver?query=" + q2(p));
 const isAdmin = new URLSearchParams(location.search).has("admin");
 if (isAdmin) document.body.classList.add("is-admin");
 
@@ -144,9 +164,7 @@ function visible() {
     (!q || [p.name, p.area, p.menu, p.memo, p.address].some(v => (v || "").toLowerCase().includes(q))));
 }
 
-/* ----- list & chips ----- */
 function render() {
-  $("count").textContent = places.length + "곳";
   const cnt = {}; places.forEach(p => { if (p.area) cnt[p.area] = (cnt[p.area] || 0) + 1; });
   const areas = Object.keys(cnt).sort((a, b) => (a === "서울 밖") - (b === "서울 밖") || cnt[b] - cnt[a]);
   const chips = $("chips"); chips.innerHTML = "";
@@ -154,64 +172,73 @@ function render() {
     const b = document.createElement("button");
     b.className = "chip" + (a === filter ? " on" : "");
     b.textContent = a === "전체" ? `전체 ${places.length}` : `${a} ${cnt[a]}`;
+    b.setAttribute("aria-pressed", a === filter);
     b.onclick = () => { filter = a; selId = null; render(); fit(); };
     chips.appendChild(b);
   });
-  const shown = visible();
-  $("listTitle").textContent = (filter === "전체" ? "야장 목록" : `${filter} 야장`) + ` (${shown.length})`;
-  const list = $("list"); list.innerHTML = "";
-  if (!shown.length) list.innerHTML = `<div class="empty">찾는 야장이 없어요 🏮</div>`;
-  shown.forEach(p => {
-    const d = document.createElement("div"); d.className = "item" + (p.id === selId ? " sel" : "");
-    d.innerHTML = `<div class="em">${TYPES[p.type] || "🍻"}</div><div class="t"><div class="n">${esc(p.name)}</div><div class="m">${esc([p.area, p.menu || p.address].filter(Boolean).join(" · "))}</div></div>`;
-    d.onclick = () => { select(p.id, true); $("mapbox").scrollIntoView({ behavior: "smooth", block: "start" }); };
-    list.appendChild(d);
-  });
-  syncMarkers(); renderSel();
-}
 
-function renderSel() {
-  const c = $("selcard"); const p = places.find(x => x.id === selId);
-  if (!p) { c.classList.remove("show"); return; }
-  const reel = safeUrl(p.reel);
-  c.innerHTML = `<button class="x" aria-label="닫기">×</button>
-    <div class="pname">${TYPES[p.type] || "🍻"} ${esc(p.name)}</div>
-    <div class="pmeta">${esc([p.area, p.type, p.menu].filter(Boolean).join(" · "))}</div>
-    ${p.address ? `<div class="pmeta">📍 ${esc(p.address)}</div>` : ""}
-    ${p.memo ? `<div class="pmemo">${esc(p.memo)}</div>` : ""}
-    <div class="btns">
-      <a class="btn naver" href="${esc(naverUrl(p))}" target="_blank" rel="noopener">N 가게 정보·리뷰</a>
-      <a class="btn" href="${esc(mapUrl(p))}" target="_blank" rel="noopener">🗺 네이버지도 앱</a>
-      ${reel ? `<a class="btn reel" href="${esc(reel)}" target="_blank" rel="noopener">▶ 릴스 보기</a>` : ""}
-    </div>`;
-  c.classList.add("show");
-  c.querySelector(".x").onclick = () => { selId = null; render(); };
+  const sel = places.find(x => x.id === selId);
+  const det = $("detail");
+  if (sel) {
+    const reel = safeUrl(sel.reel);
+    det.innerHTML = `<div class="detail">
+      <div class="d-head">
+        <div class="d-row"><span class="tag">${esc(sel.type)}</span>
+          <button class="close" id="closeSel" aria-label="닫기"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0E1512" stroke-width="2.4" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+        <h2>${esc(sel.name)}</h2>
+        ${sel.address ? `<p class="addr">${esc(sel.address)}</p>` : ""}
+      </div>
+      ${sel.menu ? `<p class="memo"><b>대표 메뉴</b> ${esc(sel.menu)}</p>` : ""}
+      ${sel.memo ? `<p class="memo">${esc(sel.memo)}</p>` : ""}
+      <div class="acts">
+        <a class="btn primary" href="${esc(infoUrl(sel))}" target="_blank" rel="noopener">가게 정보·리뷰</a>
+        ${reel ? `<a class="btn reel" href="${esc(reel)}" target="_blank" rel="noopener">릴스</a>` : ""}
+        <a class="btn line" href="${esc(mapUrl(sel))}" target="_blank" rel="noopener">지도 앱</a>
+      </div>
+    </div><div class="gap"></div>`;
+    $("closeSel").onclick = () => { selId = null; render(); };
+  } else det.innerHTML = "";
+
+  const shown = visible().filter(p => p.id !== selId);
+  const label = filter === "전체" ? (sel ? `${sel.area} 야장` : "야장") : `${filter} 야장`;
+  const listSrc = sel && filter === "전체" ? shown.filter(p => p.area === sel.area) : shown;
+  $("listTitle").textContent = sel ? `${label} ${listSrc.length}곳 더` : `${label} ${listSrc.length}곳`;
+  const list = $("list"); list.innerHTML = "";
+  if (!listSrc.length) list.innerHTML = `<div class="empty">조건에 맞는 야장이 없어요. 검색어나 동네를 바꿔 보세요.</div>`;
+  listSrc.forEach(p => {
+    const r = document.createElement("button"); r.className = "row";
+    const addr = (p.address || "").split(" ").slice(2).join(" ") || p.address || "";
+    r.innerHTML = `<span class="t"><span class="n">${esc(p.name)}</span><span class="m"><b>${esc(p.type)}</b>${esc(addr)}</span></span>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8A948F" stroke-width="2" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>`;
+    r.onclick = () => select(p.id, true);
+    list.appendChild(r);
+  });
+  syncMarkers();
 }
 
 function select(id, pan) {
-  selId = id; render();
+  selId = id; $("sheet").classList.remove("min"); render();
+  $("body").scrollTop = 0;
   const p = places.find(x => x.id === id);
-  if (p && pan && map) { map.morph(new naver.maps.LatLng(p.lat, p.lng), Math.max(map.getZoom(), 16)); }
+  if (p && pan && map) map.morph(new naver.maps.LatLng(p.lat, p.lng), Math.max(map.getZoom(), 16));
 }
 
 /* ----- map ----- */
-function markerHtml(p, sel) {
-  return `<div class="mk${sel ? " sel" : ""}"><div class="b"></div><div class="e">${TYPES[p.type] || "🍻"}</div><div class="l">${esc(p.name)}</div></div>`;
-}
+const mkHtml = (p, sel) => `<div class="mk${sel ? " sel" : ""}"><span class="lb">${esc(p.name)}</span><span class="dot"></span></div>`;
+const ANCHOR = sel => new naver.maps.Point(sel ? 13 : 9, sel ? 13 : 9);
 function syncMarkers() {
   if (!map) return;
   const vis = new Set(visible().map(p => p.id));
   places.forEach(p => {
     let m = markers.get(p.id);
     if (!m) {
-      m = new naver.maps.Marker({ position: new naver.maps.LatLng(p.lat, p.lng), map: null,
-        icon: { content: markerHtml(p, false), anchor: new naver.maps.Point(17, 42) } });
+      m = new naver.maps.Marker({ position: new naver.maps.LatLng(p.lat, p.lng), map: null, icon: { content: mkHtml(p, false), anchor: ANCHOR(false) } });
       naver.maps.Event.addListener(m, "click", () => select(p.id, false));
       m._sel = false; markers.set(p.id, m);
     }
     const sel = p.id === selId;
-    if (m._sel !== sel) { m.setIcon({ content: markerHtml(p, sel), anchor: new naver.maps.Point(17, 42) }); m.setZIndex(sel ? 1000 : 0); m._sel = sel; }
-    const want = vis.has(p.id) ? map : null;
+    if (m._sel !== sel) { m.setIcon({ content: mkHtml(p, sel), anchor: ANCHOR(sel) }); m.setZIndex(sel ? 1000 : 0); m._sel = sel; }
+    const want = vis.has(p.id) || sel ? map : null;
     if (m.getMap() !== want) m.setMap(want);
   });
 }
@@ -221,12 +248,12 @@ function fit() {
   if (!vis.length) return;
   if (vis.length === 1) { map.morph(new naver.maps.LatLng(vis[0].lat, vis[0].lng), 16); return; }
   const lats = vis.map(p => p.lat), lngs = vis.map(p => p.lng);
-  const b = new naver.maps.LatLngBounds(new naver.maps.LatLng(Math.min(...lats), Math.min(...lngs)), new naver.maps.LatLng(Math.max(...lats), Math.max(...lngs)));
-  map.fitBounds(b, { top: 40, right: 30, bottom: 40, left: 30 });
+  const wide = window.innerWidth >= 768;
+  map.fitBounds(new naver.maps.LatLngBounds(new naver.maps.LatLng(Math.min(...lats), Math.min(...lngs)), new naver.maps.LatLng(Math.max(...lats), Math.max(...lngs))),
+    wide ? { top: 40, right: 40, bottom: 40, left: 460 } : { top: 200, right: 30, bottom: window.innerHeight * 0.5, left: 30 });
 }
-function initialFit() {
-  // 전체 보기일 때는 서울 중심으로 시작 (지방 가게 때문에 너무 넓어지지 않게)
-  if (filter === "전체") { map.setCenter(new naver.maps.LatLng(37.552, 126.99)); map.setZoom(12); } else fit();
+function initialView() {
+  if (filter === "전체") { map.setCenter(new naver.maps.LatLng(37.548, 126.99)); map.setZoom(window.innerWidth >= 768 ? 13 : 12); } else fit();
 }
 
 window.initMap = function () {
@@ -235,9 +262,9 @@ window.initMap = function () {
 function startMap() {
   $("mapmsg").remove();
   map = new naver.maps.Map("map", {
-    center: new naver.maps.LatLng(37.552, 126.99), zoom: 12,
-    zoomControl: true, zoomControlOptions: { position: naver.maps.Position.TOP_RIGHT },
-    scaleControl: false, mapDataControl: false, logoControlOptions: { position: naver.maps.Position.TOP_LEFT }
+    center: new naver.maps.LatLng(37.548, 126.99), zoom: 12,
+    zoomControl: false, scaleControl: false, mapDataControl: false,
+    logoControlOptions: { position: naver.maps.Position.BOTTOM_RIGHT }
   });
   const toggleLabels = () => $("map").classList.toggle("show-labels", map.getZoom() >= 16);
   naver.maps.Event.addListener(map, "zoom_changed", toggleLabels); toggleLabels();
@@ -245,52 +272,49 @@ function startMap() {
     if (isAdmin) { setTemp(e.coord.lat(), e.coord.lng()); return; }
     if (selId) { selId = null; render(); }
   });
-  render(); initialFit();
-};
+  naver.maps.Event.addListener(map, "dragstart", () => { if (window.innerWidth < 768) $("sheet").classList.add("min"); });
+  render(); initialView();
+}
 window.navermap_authFailure = function () {
-  const box = $("mapbox"); box.innerHTML = `<div class="mapmsg">지도 인증에 실패했어요.<br>NCP 콘솔에서 Client ID와 서비스 URL 등록을 확인해 주세요.</div>`;
+  $("map").innerHTML = `<div class="mapmsg">지도 인증에 실패했어요. 네이버 클라우드 콘솔에서 이 사이트 주소가 서비스 URL로 등록돼 있는지 확인해 주세요.</div>`;
 };
-
-function loadMap() {
-  if (!NCP_KEY_ID || NCP_KEY_ID.startsWith("YOUR_")) { $("mapmsg").innerHTML = "index.html의 <b>NCP_KEY_ID</b>를 입력하면<br>네이버 지도가 표시돼요."; return; }
+(function loadMap() {
   const s = document.createElement("script");
   s.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${encodeURIComponent(NCP_KEY_ID)}&callback=initMap`;
-  s.onerror = () => { $("mapmsg").textContent = "지도를 불러오지 못했어요. 잠시 후 새로고침해 주세요."; };
+  s.onerror = () => { $("mapmsg").textContent = "지도를 불러오지 못했어요. 새로고침해 주세요."; };
   document.head.appendChild(s);
-}
+})();
+
+$("grab").onclick = () => $("sheet").classList.toggle("min");
+$("q").addEventListener("input", e => { query = e.target.value; selId = null; $("sheet").classList.remove("min"); render(); });
 
 /* ----- admin helper ----- */
 let tmp = null;
 function setTemp(lat, lng) {
   tmp = { lat: +lat.toFixed(6), lng: +lng.toFixed(6) };
   $("a_loc").textContent = `${tmp.lat}, ${tmp.lng}`;
-  const html = `<div class="mk temp"><div class="b"></div><div class="e">📍</div></div>`;
-  if (!tempMarker) tempMarker = new naver.maps.Marker({ position: new naver.maps.LatLng(tmp.lat, tmp.lng), map, icon: { content: html, anchor: new naver.maps.Point(17, 42) } });
+  const html = `<div class="mk temp"><span class="dot"></span></div>`;
+  if (!tempMarker) tempMarker = new naver.maps.Marker({ position: new naver.maps.LatLng(tmp.lat, tmp.lng), map, icon: { content: html, anchor: ANCHOR(false) } });
   else tempMarker.setPosition(new naver.maps.LatLng(tmp.lat, tmp.lng));
   out();
 }
 function out() {
   const v = k => $("a_" + k).value.trim();
-  const name = v("name");
-  const o = { id: "m" + Date.now().toString(36), name, area: v("area"), type: $("a_type").value, address: "", memo: v("memo"), menu: v("menu"), naver: v("naver"), reel: v("reel"), lat: tmp ? tmp.lat : null, lng: tmp ? tmp.lng : null };
-  $("a_out").textContent = name && tmp ? JSON.stringify(o, null, 0) + "," : "가게 이름과 위치를 넣어 주세요";
+  const o = { id: "m" + Date.now().toString(36), name: v("name"), area: v("area"), type: $("a_type").value, address: "", memo: v("memo"), menu: v("menu"), naver: v("naver"), reel: v("reel"), lat: tmp && tmp.lat, lng: tmp && tmp.lng };
+  $("a_out").textContent = o.name && tmp ? JSON.stringify(o) + "," : "가게 이름과 위치를 넣어 주세요";
 }
-Object.keys(TYPES).forEach(t => { const o = document.createElement("option"); o.value = t; o.textContent = `${TYPES[t]} ${t}`; $("a_type").appendChild(o); });
+TYPES.forEach(t => { const o = document.createElement("option"); o.value = t; o.textContent = t; $("a_type").appendChild(o); });
 ["name", "area", "type", "menu", "memo", "naver", "reel"].forEach(k => $("a_" + k).addEventListener("input", out));
-$("a_copy").onclick = async () => { try { await navigator.clipboard.writeText($("a_out").textContent); toast("복사했어요"); } catch { toast("복사 실패: 직접 선택해서 복사해 주세요"); } };
-
+$("a_copy").onclick = async () => { try { await navigator.clipboard.writeText($("a_out").textContent); toast("복사했어요"); } catch { toast("복사하지 못했어요. 직접 선택해서 복사해 주세요"); } };
 let tt; function toast(m) { const t = $("toast"); t.textContent = m; t.classList.add("show"); clearTimeout(tt); tt = setTimeout(() => t.classList.remove("show"), 2000); }
-
-$("q").addEventListener("input", e => { query = e.target.value; selId = null; render(); });
 
 /* ----- boot ----- */
 fetch(DATA_URL, { cache: "no-cache" }).then(r => r.json()).then(d => {
   places = (Array.isArray(d) ? d : []).filter(p => p && p.name && isFinite(p.lat) && isFinite(p.lng))
-    .map((p, i) => ({ ...p, id: p.id || "p" + i, lat: +p.lat, lng: +p.lng, type: TYPES[p.type] ? p.type : "기타" }))
+    .map((p, i) => ({ ...p, id: p.id || "p" + i, lat: +p.lat, lng: +p.lng, type: TYPES.includes(p.type) ? p.type : "기타" }))
     .sort((a, b) => (a.area || "").localeCompare(b.area || "", "ko") || a.name.localeCompare(b.name, "ko"));
-  render(); if (map) initialFit();
-}).catch(() => { $("list").innerHTML = `<div class="empty">목록을 불러오지 못했어요</div>`; });
-loadMap();
+  render(); if (map) initialView();
+}).catch(() => { $("list").innerHTML = `<div class="empty">목록을 불러오지 못했어요. 새로고침해 주세요.</div>`; });
 </script>
 </body>
 </html>
