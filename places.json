@@ -157,5 +157,15 @@
 {"id":"n1136070013","name":"올드빅","area":"용산구","type":"기타","address":"서울 용산구 신흥로 95-13","naver":"https://map.naver.com/p/entry/place/1136070013","lat":37.545205,"lng":126.985005},
 {"id":"n1840255296","name":"유유자적","area":"용산구","type":"기타","address":"서울 용산구 한강대로15길 12","naver":"https://map.naver.com/p/entry/place/1840255296","lat":37.526006,"lng":126.963851},
 {"id":"n1427135358","name":"맛자랑치킨","area":"강서구","type":"치킨","address":"서울 강서구 등촌동 78-7 길훈엔트런스빌 112호","naver":"https://map.naver.com/p/entry/place/1427135358","lat":37.560784,"lng":126.854618},
-{"id":"n38008282","name":"비닐하우스","area":"영등포구","type":"기타","address":"서울 영등포구 도림로128가길 13-8","naver":"https://map.naver.com/p/entry/place/38008282","lat":37.51423,"lng":126.897688}
+{"id":"n38008282","name":"비닐하우스","area":"영등포구","type":"기타","address":"서울 영등포구 도림로128가길 13-8","naver":"https://map.naver.com/p/entry/place/38008282","lat":37.51423,"lng":126.897688},
+{"id":"n1724084917","name":"자매분식","area":"중구","type":"포차","address":"서울 중구 을지로36길 23","naver":"https://map.naver.com/p/entry/place/1724084917","lat":37.565538,"lng":127.001704},
+{"id":"n798812718","name":"명륜포차","area":"종로구","type":"포차","address":"서울 종로구 대학로 135-3","naver":"https://map.naver.com/p/entry/place/798812718","lat":37.58323,"lng":127.00135},
+{"id":"n36233608","name":"정통호프","area":"성북구","type":"노가리·호프","address":"서울 성북구 삼선교로11길 12","naver":"https://map.naver.com/p/entry/place/36233608","lat":37.588503,"lng":127.009601},
+{"id":"n1512023434","name":"안동전집","area":"성북구","type":"전·막걸리","address":"서울 성북구 동소문로2길 13","naver":"https://map.naver.com/p/entry/place/1512023434","lat":37.58815,"lng":127.00721},
+{"id":"n1306544391","name":"돈대박","area":"성북구","type":"고기","address":"서울특별시 성북구 동소문동2가 145","naver":"https://map.naver.com/p/entry/place/1306544391","lat":37.588152,"lng":127.008413},
+{"id":"n1867203021","name":"고기야놀자","area":"성북구","type":"고기","address":"서울 성북구 동소문로2길 47","naver":"https://map.naver.com/p/entry/place/1867203021","lat":37.588424,"lng":127.008823},
+{"id":"n1546029131","name":"한성돼 삼겹살 한성대역본점","area":"성북구","type":"고기","address":"서울 성북구 동소문로2길 63","naver":"https://map.naver.com/p/entry/place/1546029131","lat":37.588879,"lng":127.009505},
+{"id":"n13158223","name":"동대문곱창소막창","area":"성북구","type":"고기","address":"서울 성북구 동소문로2길 53","naver":"https://map.naver.com/p/entry/place/13158223","lat":37.588598,"lng":127.009076},
+{"id":"n18897733","name":"뱃고동낙지쭈꾸미 삼선교점","area":"성북구","type":"해산물","address":"서울 성북구 삼선교로11길 16","naver":"https://map.naver.com/p/entry/place/18897733","lat":37.588577,"lng":127.009678},
+{"id":"n1599062768","name":"방목 2호점","area":"성북구","type":"기타","address":"서울 성북구 삼선교로11길 18","naver":"https://map.naver.com/p/entry/place/1599062768","lat":37.588645,"lng":127.009805}
 ]
