@@ -129,7 +129,8 @@ const TYPES = { "노가리·호프": "🍺", "포차": "🏮", "고기": "🥩",
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const safeUrl = u => { try { const x = new URL(String(u || "").trim()); return /^https?:$/.test(x.protocol) ? x.href : ""; } catch { return ""; } };
-const naverUrl = p => safeUrl(p.naver) || "https://map.naver.com/p/search/" + encodeURIComponent(`${p.name} ${p.area || ""}`.trim());
+const placeNo = p => { const m = String(p.naver || "").match(/place\/(\d+)/); return m ? m[1] : ""; };
+const naverUrl = p => placeNo(p) ? `https://m.place.naver.com/place/${placeNo(p)}/home` : (safeUrl(p.naver) || "https://m.search.naver.com/search.naver?query=" + encodeURIComponent(`${p.name} ${p.area || ""}`.trim()));
 const isAdmin = new URLSearchParams(location.search).has("admin");
 if (isAdmin) document.body.classList.add("is-admin");
 
@@ -178,7 +179,7 @@ function renderSel() {
     ${p.address ? `<div class="pmeta">📍 ${esc(p.address)}</div>` : ""}
     ${p.memo ? `<div class="pmemo">${esc(p.memo)}</div>` : ""}
     <div class="btns">
-      <a class="btn naver" href="${esc(naverUrl(p))}" target="_blank" rel="noopener">N 네이버지도</a>
+      <a class="btn naver" href="${esc(naverUrl(p))}" target="_blank" rel="noopener">N 가게 정보·리뷰</a>
       ${reel ? `<a class="btn reel" href="${esc(reel)}" target="_blank" rel="noopener">▶ 릴스 보기</a>` : ""}
     </div>`;
   c.classList.add("show");
