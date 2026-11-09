@@ -112,7 +112,7 @@ h3{margin:0 0 4px;font-size:17px;font-weight:700}
   <div class="chips" id="chips"></div>
 </div>
 
-<section class="sheet" id="sheet" aria-label="야장 목록">
+<section class="sheet min" id="sheet" aria-label="야장 목록">
   <button class="grab" id="grab" aria-label="목록 펼치기 또는 접기"><span></span></button>
   <div class="sheet-body" id="body">
     <div id="detail"></div>
@@ -173,7 +173,7 @@ function render() {
     b.className = "chip" + (a === filter ? " on" : "");
     b.textContent = a === "전체" ? `전체 ${places.length}` : `${a} ${cnt[a]}`;
     b.setAttribute("aria-pressed", a === filter);
-    b.onclick = () => { filter = a; selId = null; render(); fit(); };
+    b.onclick = () => { filter = a; selId = null; $("sheet").classList.remove("min"); render(); fit(); };
     chips.appendChild(b);
   });
 
@@ -253,7 +253,10 @@ function fit(list) {
     wide ? { top: 40, right: 40, bottom: 40, left: 460 } : { top: 200, right: 30, bottom: window.innerHeight * 0.5, left: 30 });
 }
 function initialView() {
-  fit(filter === "전체" && !query ? places.filter(p => p.area !== "서울 밖") : undefined);
+  if (filter !== "전체" || query) return fit();
+  const wide = window.innerWidth >= 768, sh = $("sheet").getBoundingClientRect();
+  map.setCenter(new naver.maps.LatLng(37.548, 126.99)); map.setZoom(wide ? 13 : 12);
+  map.panBy(new naver.maps.Point(wide ? -230 : 0, wide ? 0 : -((200 + sh.top) / 2 - window.innerHeight / 2)));
 }
 
 window.initMap = function () {
