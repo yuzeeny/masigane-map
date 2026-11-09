@@ -220,7 +220,10 @@ function select(id, pan) {
   selId = id; $("sheet").classList.remove("min"); render();
   $("body").scrollTop = 0;
   const p = places.find(x => x.id === id);
-  if (p && pan && map) map.morph(new naver.maps.LatLng(p.lat, p.lng), Math.max(map.getZoom(), 16));
+  if (!p || !pan || !map) return;
+  map.setZoom(Math.max(map.getZoom(), 16)); map.setCenter(new naver.maps.LatLng(p.lat, p.lng));
+  if (window.innerWidth >= 768) map.panBy(new naver.maps.Point(-230, 0));
+  else map.panBy(new naver.maps.Point(0, window.innerHeight / 2 - (200 + window.innerHeight * 0.52) / 2));
 }
 
 /* ----- map ----- */
@@ -233,7 +236,7 @@ function syncMarkers() {
     let m = markers.get(p.id);
     if (!m) {
       m = new naver.maps.Marker({ position: new naver.maps.LatLng(p.lat, p.lng), map: null, icon: { content: mkHtml(p, false), anchor: ANCHOR(false) } });
-      naver.maps.Event.addListener(m, "click", () => select(p.id, false));
+      naver.maps.Event.addListener(m, "click", () => select(p.id, true));
       m._sel = false; markers.set(p.id, m);
     }
     const sel = p.id === selId;
