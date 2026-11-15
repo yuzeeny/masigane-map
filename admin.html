@@ -53,6 +53,14 @@ td.name{font-weight:600;max-width:240px;overflow:hidden;text-overflow:ellipsis}
 .primary{width:100%;margin-top:18px;height:48px;border:0;border-radius:12px;background:var(--green);color:#fff;font-weight:700;font-size:16px;cursor:pointer}
 .err{color:#B3261E;font-size:14px;margin-top:10px;min-height:20px}
 .empty{padding:20px;text-align:center;color:var(--mute)}
+.ph{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.ph h2{margin:0}
+.pq{border:1px solid #C8D0CB;border-radius:10px;padding:8px 12px;min-width:200px}
+td.hl{font-weight:700;color:var(--green)}
+tr.zero td{color:var(--mute)}
+td .ar{margin-left:6px;font-size:12px;color:var(--mute);font-weight:500}
+.tbl{max-height:640px;overflow:auto}
+thead th{position:sticky;top:0;background:#fff}
 </style>
 </head>
 <body>
@@ -63,6 +71,7 @@ td.name{font-weight:600;max-width:240px;overflow:hidden;text-overflow:ellipsis}
 const SUPA_URL = "https://qcrnllwyquqsvebxxwyl.supabase.co";
 const SUPA_KEY = "sb_publishable_gfYEhAJYkvEvbgfG1FNV1g_4M2QXUAB";
 const MAPS = { yajang: "야장", bangeo: "방어" };
+const FILES = { yajang: "places.json", bangeo: "bangeo.json" };
 /* ====================================== */
 
 const $app = document.getElementById("app");
@@ -71,7 +80,11 @@ const fmt = n => (n || 0).toLocaleString("ko-KR");
 if (!SUPA_URL || !SUPA_KEY) { $app.innerHTML = `<div class="login"><h1>설정이 필요해요</h1><p class="muted">admin.html의 SUPA_URL, SUPA_KEY를 채워 주세요.</p></div>`; throw 0; }
 const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
 
-let range = 7, mapF = "all", sortKey = "opens", data = null;
+let range = 7, mapF = "all", sortKey = "opens", data = null, pq = "", ALL = null;
+// 지도 데이터의 모든 가게 목록 (조회 0인 가게도 표에 보이도록)
+const allPlaces = () => ALL ? Promise.resolve(ALL) : Promise.all(Object.entries(FILES).map(([m, f]) =>
+  fetch(f, { cache: "no-cache" }).then(r => r.ok ? r.json() : []).catch(() => []).then(d => (Array.isArray(d) ? d : []).map(p => ({ map: m, place_id: p.id, name: p.name, area: p.area || "" })))))
+  .then(a => (ALL = a.flat()));
 
 function loginView(msg) {
   $app.innerHTML = `<form class="login" id="lf">
@@ -94,14 +107,19 @@ async function load() {
   $app.innerHTML = `<div class="wrap"><p class="muted">불러오는 중…</p></div>`;
   const { data: d, error } = await sb.rpc("admin_stats", { since: since.toISOString(), map_filter: mapF === "all" ? null : mapF });
   if (error) { if (/JWT|auth|permission/i.test(error.message)) return loginView("다시 로그인해 주세요."); $app.innerHTML = `<div class="wrap"><p class="err">통계를 불러오지 못했어요: ${esc(error.message)}</p></div>`; return; }
-  data = d; view();
+  await allPlaces(); data = d; view();
 }
 
 function view() {
   const t = data.totals || {};
   const daily = data.daily || [];
   const max = Math.max(1, ...daily.map(x => x.views));
-  const places = [...(data.places || [])].sort((a, b) => (b[sortKey] || 0) - (a[sortKey] || 0));
+  const st = new Map((data.places || []).map(p => [p.map + "|" + p.place_id, p]));
+  const base = (ALL || []).filter(p => mapF === "all" || p.map === mapF);
+  const seen = new Set(base.map(p => p.map + "|" + p.place_id));
+  (data.places || []).forEach(p => { if (!seen.has(p.map + "|" + p.place_id)) base.push({ map: p.map, place_id: p.place_id, name: p.name, area: "" }); });
+  const rows = base.map(p => { const s = st.get(p.map + "|" + p.place_id) || {}; const r = { ...p, opens: s.opens || 0, info: s.info || 0, mapapp: s.mapapp || 0, reel: s.reel || 0 }; r.total = r.info + r.mapapp + r.reel; return r; });
+  const places = rows.sort((a, b) => (b[sortKey] || 0) - (a[sortKey] || 0) || a.name.localeCompare(b.name, "ko"));
   const segR = [[1, "오늘"], [7, "7일"], [30, "30일"], [0, "전체"]].map(([v, l]) => `<button data-r="${v}" class="${v === range ? "on" : ""}">${l}</button>`).join("");
   const segM = [["all", "전체 지도"], ...Object.entries(MAPS)].map(([v, l]) => `<button data-m="${v}" class="${v === mapF ? "on" : ""}">${l}</button>`).join("");
   const th = (k, l) => `<th data-s="${k}" class="${k === sortKey ? "on" : ""}">${l}${k === sortKey ? " ▼" : ""}</th>`;
@@ -111,7 +129,7 @@ function view() {
     <section class="kpis">
       <div class="kpi"><div class="l">페이지 방문</div><div class="v">${fmt(t.page_view)}</div></div>
       <div class="kpi"><div class="l">방문자 수</div><div class="v">${fmt(data.visitors)}</div></div>
-      <div class="kpi"><div class="l">가게 열람</div><div class="v">${fmt(t.place_open)}</div></div>
+      <div class="kpi"><div class="l">가게 조회수</div><div class="v">${fmt(t.place_open)}</div></div>
       <div class="kpi"><div class="l">가게 정보·리뷰 클릭</div><div class="v">${fmt(t.info_click)}</div></div>
       <div class="kpi"><div class="l">지도 앱 클릭</div><div class="v">${fmt(t.mapapp_click)}</div></div>
       <div class="kpi pink"><div class="l">인스타 팔로우 클릭</div><div class="v">${fmt(t.insta_click)}</div></div>
@@ -126,14 +144,20 @@ function view() {
         <div class="list">${(data.refs || []).map(r => `<div><span>${esc(r.ref)}</span><b>${fmt(r.c)}</b></div>`).join("") || `<span class="muted">기록 없음</span>`}</div>
       </section>
     </div>
-    <section class="card"><h2>가게별 클릭</h2>
-      ${places.length ? `<div class="tbl"><table><thead><tr><th>가게</th><th>지도</th>${th("opens", "열람")}${th("info", "정보·리뷰")}${th("mapapp", "지도 앱")}${th("reel", "릴스")}</tr></thead>
-      <tbody>${places.slice(0, 100).map(p => `<tr><td class="name">${esc(p.name)}</td><td>${esc(MAPS[p.map] || p.map)}</td><td>${fmt(p.opens)}</td><td>${fmt(p.info)}</td><td>${fmt(p.mapapp)}</td><td>${fmt(p.reel)}</td></tr>`).join("")}</tbody></table></div>`
+    <section class="card"><div class="ph"><h2>가게별 조회수 <span class="muted">${fmt(places.length)}곳 · 제목을 누르면 정렬</span></h2>
+      <input id="pq" class="pq" type="search" placeholder="가게, 동네 검색" value="${esc(pq)}" aria-label="가게 검색"></div>
+      ${places.length ? `<div class="tbl"><table><thead><tr><th>가게</th><th>지도</th>${th("opens", "조회수")}${th("info", "정보·리뷰")}${th("mapapp", "지도 앱")}${th("reel", "릴스")}${th("total", "클릭 합계")}</tr></thead>
+      <tbody id="ptb"></tbody></table></div>`
       : `<div class="empty">아직 가게를 누른 기록이 없어요</div>`}
     </section>
   </div>`;
   $app.querySelectorAll("[data-r]").forEach(b => b.onclick = () => { range = +b.dataset.r; load(); });
   $app.querySelectorAll("[data-m]").forEach(b => b.onclick = () => { mapF = b.dataset.m; load(); });
+  const fill = () => { const q = pq.trim().toLowerCase(); const tb = document.getElementById("ptb"); if (!tb) return;
+    const list = places.filter(p => !q || (p.name + " " + p.area).toLowerCase().includes(q));
+    tb.innerHTML = list.map(p => `<tr class="${p.opens ? "" : "zero"}"><td class="name">${esc(p.name)}${p.area ? `<span class="ar">${esc(p.area)}</span>` : ""}</td><td>${esc(MAPS[p.map] || p.map)}</td><td class="hl">${fmt(p.opens)}</td><td>${fmt(p.info)}</td><td>${fmt(p.mapapp)}</td><td>${fmt(p.reel)}</td><td>${fmt(p.total)}</td></tr>`).join("") || `<tr><td colspan="7" class="empty">검색 결과가 없어요</td></tr>`; };
+  fill();
+  const pqi = document.getElementById("pq"); if (pqi) pqi.oninput = e => { pq = e.target.value; fill(); };
   $app.querySelectorAll("[data-s]").forEach(b => b.onclick = () => { sortKey = b.dataset.s; view(); });
   document.getElementById("out").onclick = async () => { await sb.auth.signOut(); loginView(); };
 }
