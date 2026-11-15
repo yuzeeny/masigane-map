@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--ink:#0E1512;--sub:#3E4944;--mute:#8A948F;--line:#EBEEEC;--soft:#F2F4F3;--green:#0B7A50;--green-d:#08643F;--green-l:#E3F3EB;--pink:#D6245F}
+:root{--pin:#0B7A50;--ink:#0E1512;--sub:#3E4944;--mute:#8A948F;--line:#EBEEEC;--soft:#F2F4F3;--green:#0B7A50;--green-d:#08643F;--green-l:#E3F3EB;--pink:#D6245F}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;height:100%;overflow:hidden;font-family:"IBM Plex Sans KR",system-ui,sans-serif;color:var(--ink);background:#EEF1EF}
 button,input{font-family:inherit}
@@ -26,10 +26,29 @@ h1{margin:0;font-size:25px;font-weight:700;letter-spacing:-.8px;line-height:1.2}
 .follow{flex:none;height:40px;padding:0 14px 0 11px;border-radius:20px;background:var(--pink);color:#fff;text-decoration:none;font-size:14px;font-weight:700;display:flex;align-items:center;gap:6px}
 .search{display:flex;align-items:center;gap:10px;height:44px;padding:0 14px;border-radius:10px;background:var(--soft)}
 .search input{border:0;outline:none;background:transparent;flex:1;min-width:0;font-size:16px;font-weight:500;color:var(--ink)}
-.tabs{display:flex;gap:4px;background:var(--soft);border-radius:12px;padding:4px}
-.tab{flex:1;height:40px;border:0;border-radius:9px;background:none;font-size:16px;font-weight:600;color:var(--sub);cursor:pointer}
-.tab.on{background:#fff;color:var(--ink);font-weight:700;box-shadow:0 1px 3px rgba(14,21,18,.15)}
-.tab .c{font-size:13px;color:var(--mute);margin-left:4px;font-weight:600}
+.maps{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:0 -14px 0 -16px;padding:0 14px 0 16px}
+.maps::-webkit-scrollbar{display:none}
+.mp{flex:none;height:44px;padding:0 16px 0 13px;border-radius:12px;border:1.5px solid #DDE3DF;background:#fff;display:flex;align-items:center;gap:8px;font:700 16px "IBM Plex Sans KR",sans-serif;color:var(--ink);cursor:pointer}
+.mp i{width:10px;height:10px;border-radius:50%;flex:none}
+.mp small{font-size:13px;font-weight:600;color:var(--mute)}
+.mp.on{color:#fff}
+.mp.on i{background:#fff!important}
+.mp.on small{color:rgba(255,255,255,.85)}
+.mp.more{border-style:dashed;color:var(--sub);font-weight:600}
+.dim{position:fixed;inset:0;z-index:60;background:rgba(14,21,18,.45);display:none}
+.dim.open{display:block}
+.picker{position:fixed;left:0;right:0;bottom:0;z-index:61;background:#fff;border-radius:24px 24px 0 0;padding:10px 20px calc(env(safe-area-inset-bottom) + 24px);display:none;flex-direction:column;gap:14px}
+.picker.open{display:flex}
+.picker .bar{align-self:center;width:40px;height:5px;border-radius:3px;background:#C8D0CB}
+.picker-h{display:flex;justify-content:space-between;align-items:baseline}
+.picker-h h2{font-size:22px;letter-spacing:-.5px}
+.picker-h span{font-size:13px;color:var(--mute)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mcard{min-height:76px;border-radius:14px;border:1px solid #DDE3DF;background:#fff;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:4px;padding:10px 16px;font-family:inherit;text-align:left;cursor:pointer;color:var(--ink)}
+.mcard.on{border:2px solid var(--ink);background:var(--soft)}
+.mcard .n{display:flex;align-items:center;gap:8px;font-size:18px;font-weight:700}
+.mcard .n i{width:10px;height:10px;border-radius:50%}
+.mcard .s{font-size:13px;font-weight:600;color:var(--sub)}
 .chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 -14px;padding:0 14px}
 .chips::-webkit-scrollbar{display:none}
 .chip{flex:none;height:38px;padding:0 15px;border-radius:19px;border:1px solid #C8D0CB;background:#fff;color:var(--ink);font-size:14px;font-weight:600;cursor:pointer}
@@ -37,7 +56,7 @@ h1{margin:0;font-size:25px;font-weight:700;letter-spacing:-.8px;line-height:1.2}
 
 /* markers */
 .mk{position:relative;cursor:pointer;display:flex;flex-direction:column;align-items:center}
-.mk .dot{width:18px;height:18px;border-radius:50%;background:var(--green);border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+.mk .dot{width:18px;height:18px;border-radius:50%;background:var(--pin);border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.3)}
 .mk .lb{position:absolute;bottom:22px;white-space:nowrap;background:var(--ink);color:#fff;font:700 12px "IBM Plex Sans KR",sans-serif;padding:4px 8px;border-radius:7px;display:none}
 .show-labels .mk .lb{display:block;background:#fff;color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.2)}
 .mk.sel .dot{width:26px;height:26px;border-width:4px;box-shadow:0 2px 8px rgba(0,0,0,.35)}
@@ -89,10 +108,12 @@ h3{margin:0 0 4px;font-size:17px;font-weight:700}
 .toast.show{opacity:1}
 
 @media (min-width:768px){
-  .sheet{left:14px;right:auto;bottom:14px;top:calc(env(safe-area-inset-top) + 272px);width:420px;max-height:none;border-radius:16px}
+  .sheet{left:14px;right:auto;bottom:14px;top:calc(env(safe-area-inset-top) + 268px);width:420px;max-height:none;border-radius:16px}
   .sheet.min{max-height:none}
   .grab{display:none}
   .toast{bottom:24px}
+  .picker{left:50%;right:auto;bottom:auto;top:50%;transform:translate(-50%,-50%);width:440px;border-radius:20px;padding:20px 22px 22px}
+  .picker .bar{display:none}
 }
 @media (prefers-reduced-motion:reduce){.sheet{transition:none}}
 </style>
@@ -108,7 +129,7 @@ h3{margin:0 0 4px;font-size:17px;font-weight:700}
       <a class="follow" data-ev="insta_click" href="https://www.instagram.com/masigane_masiga/" target="_blank" rel="noopener" aria-label="마시가네 인스타그램 팔로우">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="5"/><circle cx="12" cy="12" r="3.6"/><circle cx="16.8" cy="7.2" r=".6" fill="#fff"/></svg>팔로우</a>
     </div>
-    <div class="tabs" id="tabs" role="tablist" aria-label="지도 종류"></div>
+    <nav class="maps" id="maps" aria-label="지도 종류"></nav>
     <label class="search">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3E4944" stroke-width="2.2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
       <input id="q" type="search" placeholder="가게, 동네 검색" aria-label="가게 검색">
@@ -142,14 +163,20 @@ h3{margin:0 0 4px;font-size:17px;font-weight:700}
   </div>
 </section>
 <div class="toast" id="toast" role="status"></div>
+<div class="dim" id="dim"></div>
+<section class="picker" id="picker" role="dialog" aria-modal="true" aria-labelledby="pickerT">
+  <div class="bar" aria-hidden="true"></div>
+  <div class="picker-h"><h2 id="pickerT">어떤 지도 볼까요?</h2><span>계속 늘어나요</span></div>
+  <div class="grid" id="grid"></div>
+</section>
 
 <script>
 /* ===== 설정 ===== */
 const NCP_KEY_ID = "t2hlw513tp";
 // 지도 종류: 새 지도는 여기에 한 줄 추가 + 데이터 파일(json) 추가
 const MAPS = [
-  { id: "yajang", name: "야장", file: "places.json" },
-  { id: "bangeo", name: "방어", file: "bangeo.json" }
+  { id: "yajang", name: "야장", file: "places.json", color: "#0B7A50" },
+  { id: "bangeo", name: "방어", file: "bangeo.json", color: "#1F5FBF" }
 ];
 // 방문·클릭 통계 (Supabase). 비어 있으면 기록하지 않아요.
 const SUPA_URL = "https://qcrnllwyquqsvebxxwyl.supabase.co";
@@ -197,18 +224,39 @@ function visible() {
     (!q || [p.name, p.area, p.menu, p.memo, p.address].some(v => (v || "").toLowerCase().includes(q))));
 }
 
+const PILL_MAX = 4; // 이보다 많으면 끝에 "전체" 버튼
 function renderTabs() {
-  const t = $("tabs"); t.innerHTML = "";
+  document.documentElement.style.setProperty("--pin", cur.color || "#0B7A50");
+  const cnt = m => cache[m.id] ? cache[m.id].length : null;
+  const sub = m => { const n = cnt(m); return n ? `${n}` : n === 0 ? "준비 중" : ""; };
+  const nav = $("maps"); nav.innerHTML = "";
   MAPS.forEach(m => {
     const b = document.createElement("button");
-    b.className = "tab" + (m === cur ? " on" : ""); b.setAttribute("role", "tab"); b.setAttribute("aria-selected", m === cur);
-    const n = cache[m.id] ? cache[m.id].length : null;
-    b.innerHTML = `${esc(m.name)}${n ? `<span class="c">${n}</span>` : ""}`;
-    b.onclick = () => { if (m !== cur) { location.hash = m.id; } };
-    t.appendChild(b);
+    b.className = "mp" + (m === cur ? " on" : ""); b.setAttribute("aria-pressed", m === cur);
+    if (m === cur) { b.style.background = m.color; b.style.borderColor = m.color; }
+    b.innerHTML = `<i style="background:${m.color}"></i>${esc(m.name)}<small>${sub(m)}</small>`;
+    b.onclick = () => { if (m !== cur) location.hash = m.id; };
+    nav.appendChild(b);
+  });
+  if (MAPS.length > PILL_MAX) {
+    const b = document.createElement("button"); b.className = "mp more"; b.textContent = `전체 ${MAPS.length}개`;
+    b.onclick = openPicker; nav.appendChild(b);
+  }
+  const on = nav.querySelector(".on"); if (on) on.scrollIntoView({ block: "nearest", inline: "nearest" });
+  const g = $("grid"); g.innerHTML = "";
+  MAPS.forEach(m => {
+    const b = document.createElement("button");
+    b.className = "mcard" + (m === cur ? " on" : "");
+    b.innerHTML = `<span class="n"><i style="background:${m.color}"></i>${esc(m.name)}</span><span class="s">${cnt(m) ? cnt(m) + "곳" : sub(m)}</span>`;
+    b.onclick = () => { closePicker(); if (m !== cur) location.hash = m.id; };
+    g.appendChild(b);
   });
 }
-
+function openPicker() { $("dim").classList.add("open"); $("picker").classList.add("open"); const on = $("grid").querySelector(".on"); (on || $("grid").firstChild)?.focus(); }
+function closePicker() { if (!$("picker").classList.contains("open")) return; $("dim").classList.remove("open"); $("picker").classList.remove("open"); }
+$("dim").onclick = closePicker;
+renderTabs();
+document.addEventListener("keydown", e => { if (e.key === "Escape") closePicker(); });
 function render() {
   renderTabs();
   const cnt = {}; places.forEach(p => { if (p.area) cnt[p.area] = (cnt[p.area] || 0) + 1; });
