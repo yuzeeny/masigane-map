@@ -10,49 +10,32 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--pin:#0B7A50;--ink:#0E1512;--sub:#3E4944;--mute:#8A948F;--line:#EBEEEC;--soft:#F2F4F3;--green:#0B7A50;--green-d:#08643F;--green-l:#E3F3EB;--pink:#D6245F}
+:root{--pin:#0E1512;--ink:#0E1512;--sub:#4E5968;--mute:#8B95A1;--line:#ECEEF0;--soft:#F2F4F6;--green:#0B7A50;--green-d:#08643F;--green-l:#E3F3EB;--pink:#D6245F}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;height:100%;overflow:hidden;font-family:"IBM Plex Sans KR",system-ui,sans-serif;color:var(--ink);background:#EEF1EF}
 button,input{font-family:inherit}
 #map{position:fixed;inset:0;width:100%;height:100vh;height:100dvh}
 .mapmsg{position:fixed;inset:0;display:grid;place-items:center;text-align:center;color:var(--sub);font-size:15px;line-height:1.6;padding:24px}
-:focus-visible{outline:3px solid var(--green);outline-offset:2px}
+:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
 
 /* top */
-.top{position:fixed;left:14px;right:14px;top:calc(env(safe-area-inset-top) + 14px);z-index:20;display:flex;flex-direction:column;gap:10px;max-width:420px}
-.head{background:#fff;border-radius:16px;padding:14px 14px 14px 16px;box-shadow:0 2px 10px rgba(14,21,18,.12);display:flex;flex-direction:column;gap:10px}
-.head-row{display:flex;justify-content:space-between;align-items:center;gap:10px}
-h1{margin:0;font-size:25px;font-weight:700;letter-spacing:-.8px;line-height:1.2}
-.follow{flex:none;height:40px;padding:0 14px 0 11px;border-radius:20px;background:var(--pink);color:#fff;text-decoration:none;font-size:14px;font-weight:700;display:flex;align-items:center;gap:6px}
-.search{display:flex;align-items:center;gap:10px;height:44px;padding:0 14px;border-radius:10px;background:var(--soft)}
-.search input{border:0;outline:none;background:transparent;flex:1;min-width:0;font-size:16px;font-weight:500;color:var(--ink)}
-.maps{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:0 -14px 0 -16px;padding:0 14px 0 16px}
+.top{position:fixed;left:0;right:0;top:0;z-index:20;display:flex;flex-direction:column;gap:12px;pointer-events:none}
+.top>*{pointer-events:auto}
+.head{background:#fff;padding:calc(env(safe-area-inset-top) + 20px) 20px 0;display:flex;flex-direction:column;gap:14px;box-shadow:0 1px 0 var(--line)}
+.head-row{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.handle{margin:0 0 6px;font-size:14px;font-weight:600;color:var(--mute);letter-spacing:0}
+h1{margin:0;font-size:32px;font-weight:700;letter-spacing:-1.4px;line-height:1.12}
+.follow{flex:none;height:44px;padding:0 16px 0 13px;border-radius:22px;background:var(--ink);color:#fff;text-decoration:none;font-size:15px;font-weight:700;display:flex;align-items:center;gap:6px;margin-top:2px}
+.maps{display:flex;gap:24px;overflow-x:auto;scrollbar-width:none;margin:0 -20px;padding:0 20px}
 .maps::-webkit-scrollbar{display:none}
-.mp{flex:none;height:44px;padding:0 16px 0 13px;border-radius:12px;border:1.5px solid #DDE3DF;background:#fff;display:flex;align-items:center;gap:8px;font:700 16px "IBM Plex Sans KR",sans-serif;color:var(--ink);cursor:pointer}
-.mp i{width:10px;height:10px;border-radius:50%;flex:none}
-.mp small{font-size:13px;font-weight:600;color:var(--mute)}
-.mp.on{color:#fff}
-.mp.on i{background:#fff!important}
-.mp.on small{color:rgba(255,255,255,.85)}
-.mp.more{border-style:dashed;color:var(--sub);font-weight:600}
-.dim{position:fixed;inset:0;z-index:60;background:rgba(14,21,18,.45);display:none}
-.dim.open{display:block}
-.picker{position:fixed;left:0;right:0;bottom:0;z-index:61;background:#fff;border-radius:24px 24px 0 0;padding:10px 20px calc(env(safe-area-inset-bottom) + 24px);display:none;flex-direction:column;gap:14px}
-.picker.open{display:flex}
-.picker .bar{align-self:center;width:40px;height:5px;border-radius:3px;background:#C8D0CB}
-.picker-h{display:flex;justify-content:space-between;align-items:baseline}
-.picker-h h2{font-size:22px;letter-spacing:-.5px}
-.picker-h span{font-size:13px;color:var(--mute)}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.mcard{min-height:76px;border-radius:14px;border:1px solid #DDE3DF;background:#fff;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:4px;padding:10px 16px;font-family:inherit;text-align:left;cursor:pointer;color:var(--ink)}
-.mcard.on{border:2px solid var(--ink);background:var(--soft)}
-.mcard .n{display:flex;align-items:center;gap:8px;font-size:18px;font-weight:700}
-.mcard .n i{width:10px;height:10px;border-radius:50%}
-.mcard .s{font-size:13px;font-weight:600;color:var(--sub)}
-.chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 -14px;padding:0 14px}
+.mp{flex:none;border:0;background:none;padding:2px 0 12px;font:700 19px "IBM Plex Sans KR",sans-serif;letter-spacing:-.4px;color:#B4BBC2;cursor:pointer;border-bottom:3px solid transparent;display:flex;align-items:baseline;gap:6px}
+.mp small{font-size:14px;font-weight:600}
+.mp.on{color:var(--ink);border-bottom-color:var(--ink)}
+.mp.more{color:var(--sub);font-weight:600}
+.chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:0 20px}
 .chips::-webkit-scrollbar{display:none}
-.chip{flex:none;height:38px;padding:0 15px;border-radius:19px;border:1px solid #C8D0CB;background:#fff;color:var(--ink);font-size:14px;font-weight:600;cursor:pointer}
-.chip.on{background:var(--ink);border-color:var(--ink);color:#fff;font-weight:700}
+.chip{flex:none;height:38px;padding:0 15px;border-radius:19px;border:0;background:#fff;color:var(--ink);font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 1px 4px rgba(14,21,18,.16)}
+.chip.on{background:var(--ink);color:#fff;font-weight:700}
 
 /* markers */
 .mk{position:relative;cursor:pointer;display:flex;flex-direction:column;align-items:center}
@@ -63,36 +46,48 @@ h1{margin:0;font-size:25px;font-weight:700;letter-spacing:-.8px;line-height:1.2}
 .mk.sel .lb{display:block;bottom:30px;background:var(--ink);color:#fff;font-size:13px;padding:5px 10px}
 .mk.temp .dot{background:var(--pink)}
 
-/* sheet */
-.sheet{position:fixed;left:0;right:0;bottom:0;z-index:30;background:#fff;border-radius:24px 24px 0 0;box-shadow:0 -6px 24px rgba(14,21,18,.14);display:flex;flex-direction:column;max-height:48vh;transition:max-height .25s ease}
-.sheet.min{max-height:96px}
-.grab{border:0;background:none;padding:10px 0 6px;width:100%;cursor:pointer;display:flex;justify-content:center;flex:none}
-.grab span{width:40px;height:5px;border-radius:3px;background:#C8D0CB}
-.sheet-body{overflow-y:auto;padding:0 20px calc(env(safe-area-inset-bottom) + 16px);-webkit-overflow-scrolling:touch}
-.detail{display:flex;flex-direction:column;gap:16px;padding-bottom:18px}
-.tag{align-self:flex-start;font-size:13px;font-weight:700;color:var(--green-d);background:var(--green-l);padding:4px 9px;border-radius:6px}
-.d-head{display:flex;flex-direction:column;gap:6px}
+/* list button (FAB) */
+.fab{position:fixed;right:20px;bottom:calc(env(safe-area-inset-bottom) + 24px);z-index:35;width:84px;height:84px;border-radius:50%;border:0;background:var(--ink);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font:700 15px "IBM Plex Sans KR",sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.3);cursor:pointer;transition:bottom .2s ease}
+.fab small{font-size:12px;font-weight:600;opacity:.75}
+
+/* place card */
+.card{position:fixed;left:16px;right:16px;bottom:calc(env(safe-area-inset-bottom) + 16px);z-index:30;background:#fff;border-radius:22px;padding:18px 18px 16px;box-shadow:0 8px 28px rgba(14,21,18,.18);display:none}
+.card.show{display:block}
+.detail{display:flex;flex-direction:column;gap:12px}
+.tag{font-size:13px;font-weight:700;color:var(--sub)}
+.d-head{display:flex;flex-direction:column;gap:4px}
 .d-row{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
-h2{margin:0;font-size:26px;font-weight:700;letter-spacing:-.6px;line-height:1.25}
+h2{margin:0;font-size:24px;font-weight:700;letter-spacing:-.7px;line-height:1.25}
 .addr{margin:0;font-size:15px;color:var(--sub)}
 .memo{margin:0;font-size:15px;line-height:1.6;white-space:pre-wrap}
-.close{flex:none;width:44px;height:44px;margin:-6px -10px 0 0;border:0;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.close{flex:none;width:44px;height:44px;margin:-10px -10px 0 0;border:0;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .acts{display:flex;gap:8px}
-.btn{height:52px;border-radius:12px;font-size:16px;font-weight:700;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:6px}
-.btn.primary{flex:1;background:var(--green);color:#fff}
-.btn.line{flex:none;padding:0 18px;border:1.5px solid var(--ink);color:var(--ink)}
+.btn{height:52px;border-radius:14px;font-size:16px;font-weight:700;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn.primary{flex:1;background:var(--ink);color:#fff}
+.btn.line{flex:none;padding:0 18px;background:var(--soft);color:var(--ink)}
 .btn.reel{flex:none;padding:0 16px;background:#FBE4EC;color:#9C1440}
-.gap{height:8px;margin:0 -20px 16px;background:var(--soft)}
-h3{margin:0 0 4px;font-size:17px;font-weight:700}
+
+/* list panel */
+.sheet{position:fixed;left:0;right:0;bottom:0;height:56vh;height:56dvh;z-index:40;background:#fff;border-radius:24px 24px 0 0;box-shadow:0 -8px 30px rgba(14,21,18,.16);display:flex;flex-direction:column;transform:translateY(105%);transition:transform .25s ease;visibility:hidden}
+.sheet.open{transform:none;visibility:visible}
+.sheet-top{padding:18px 20px 12px;display:flex;flex-direction:column;gap:12px;border-bottom:1px solid var(--line)}
+.sheet-h{display:flex;justify-content:space-between;align-items:center}
+h3{margin:0;font-size:24px;font-weight:700;letter-spacing:-.7px}
+.toMap{height:44px;padding:0 16px;border-radius:22px;border:0;background:var(--soft);color:var(--ink);font:700 15px "IBM Plex Sans KR",sans-serif;cursor:pointer;display:flex;align-items:center;gap:6px}
+.search{display:flex;align-items:center;gap:10px;height:48px;padding:0 14px;border-radius:14px;background:var(--soft)}
+.search input{border:0;outline:none;background:transparent;flex:1;min-width:0;font-size:16px;font-weight:500;color:var(--ink)}
+.sheet-body{flex:1;overflow-y:auto;padding:0 20px calc(env(safe-area-inset-bottom) + 24px);-webkit-overflow-scrolling:touch}
 .list{display:flex;flex-direction:column}
-.row{display:flex;align-items:center;gap:12px;min-height:64px;width:100%;text-align:left;border:0;border-bottom:1px solid var(--line);background:none;padding:8px 0;cursor:pointer;color:var(--ink)}
+.row{display:flex;align-items:center;gap:12px;min-height:72px;width:100%;text-align:left;border:0;border-bottom:1px solid var(--line);background:none;padding:10px 0;cursor:pointer;color:var(--ink)}
 .row:last-child{border-bottom:0}
-.row .t{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
-.row .n{font-size:16px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.row .m{font-size:14px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.row .m b{color:var(--green-d);font-weight:600;margin-right:6px}
-.empty{padding:24px 0;text-align:center;color:var(--sub);font-size:15px}
-.foot{font-size:12px;color:var(--mute);text-align:center;padding:14px 0 4px}
+.row.on{background:var(--soft);margin:0 -20px;padding:10px 20px;width:calc(100% + 40px)}
+#sdetail:not(:empty){padding:16px 0 18px;margin:0 -20px;padding-left:20px;padding-right:20px;border-bottom:8px solid var(--soft)}
+.row .t{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.row .n{font-size:17px;font-weight:700;letter-spacing:-.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .m{font-size:14px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .m b{color:var(--sub);font-weight:600;margin-right:6px}
+.empty{padding:32px 0;text-align:center;color:var(--sub);font-size:15px;line-height:1.6}
+.foot{font-size:12px;color:var(--mute);text-align:center;padding:16px 0 4px}
 
 /* admin (?admin) */
 .admin{display:none;border-top:8px solid var(--soft);margin:12px -20px 0;padding:16px 20px 0}
@@ -104,18 +99,31 @@ h3{margin:0 0 4px;font-size:17px;font-weight:700}
 .admin pre{background:var(--soft);border-radius:10px;padding:10px;font-size:12px;white-space:pre-wrap;word-break:break-all;min-height:40px}
 .admin .btn{margin-top:10px;width:100%;border:0;cursor:pointer}
 
-.toast{position:fixed;left:50%;bottom:calc(48vh + 12px);transform:translateX(-50%);background:rgba(14,21,18,.9);color:#fff;padding:10px 16px;border-radius:999px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:50;white-space:nowrap}
+.dim{position:fixed;inset:0;z-index:60;background:rgba(14,21,18,.45);display:none}
+.dim.open{display:block}
+.picker{position:fixed;left:0;right:0;bottom:0;z-index:61;background:#fff;border-radius:24px 24px 0 0;padding:20px 20px calc(env(safe-area-inset-bottom) + 24px);display:none;flex-direction:column;gap:14px}
+.picker.open{display:flex}
+.picker h2{font-size:22px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mcard{min-height:72px;border-radius:16px;border:0;background:var(--soft);display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:4px;padding:10px 16px;font-family:inherit;text-align:left;cursor:pointer;color:var(--ink)}
+.mcard.on{background:var(--ink);color:#fff}
+.mcard .n{font-size:18px;font-weight:700}
+.mcard .s{font-size:13px;font-weight:600;opacity:.7}
+
+.toast{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(14,21,18,.9);color:#fff;padding:10px 16px;border-radius:999px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:70;white-space:nowrap}
 .toast.show{opacity:1}
 
 @media (min-width:768px){
-  .sheet{left:14px;right:auto;bottom:14px;top:calc(env(safe-area-inset-top) + 268px);width:420px;max-height:none;border-radius:16px}
-  .sheet.min{max-height:none}
-  .grab{display:none}
-  .toast{bottom:24px}
-  .picker{left:50%;right:auto;bottom:auto;top:50%;transform:translate(-50%,-50%);width:440px;border-radius:20px;padding:20px 22px 22px}
-  .picker .bar{display:none}
+  .top{right:auto;width:440px;left:16px;top:16px}
+  .head{border-radius:24px;padding:22px 22px 0;box-shadow:0 4px 20px rgba(14,21,18,.10)}
+  .chips{padding:0}
+  .sheet{left:16px;right:auto;top:auto;bottom:16px;width:440px;height:calc(100vh - var(--top-h, 240px) - 28px);border-radius:24px;transform:none;visibility:visible;box-shadow:0 4px 20px rgba(14,21,18,.10)}
+  .sheet-top{padding-top:18px}
+  .toMap,.fab{display:none}
+  .card{left:auto;right:24px;width:380px;bottom:24px}
+  .picker{left:50%;right:auto;bottom:auto;top:50%;transform:translate(-50%,-50%);width:440px;border-radius:24px}
 }
-@media (prefers-reduced-motion:reduce){.sheet{transition:none}}
+@media (prefers-reduced-motion:reduce){.sheet,.fab{transition:none}}
 </style>
 </head>
 <body>
@@ -123,26 +131,29 @@ h3{margin:0 0 4px;font-size:17px;font-weight:700}
 <div class="mapmsg" id="mapmsg">지도를 불러오는 중이에요</div>
 
 <div class="top" id="top">
-  <div class="head">
+  <header class="head">
     <div class="head-row">
-      <h1>마시가네 맛집 지도</h1>
-      <a class="follow" data-ev="insta_click" href="https://www.instagram.com/masigane_masiga/" target="_blank" rel="noopener" aria-label="마시가네 인스타그램 팔로우">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="5"/><circle cx="12" cy="12" r="3.6"/><circle cx="16.8" cy="7.2" r=".6" fill="#fff"/></svg>팔로우</a>
+      <div><p class="handle">@masigane_masiga</p><h1>마시가네<br>맛집 지도</h1></div>
+      <a class="follow" data-ev="insta_click" href="https://www.instagram.com/masigane_masiga/" target="_blank" rel="noopener" aria-label="마시가네 인스타그램 팔로우"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="5"/><circle cx="12" cy="12" r="3.6"/><circle cx="16.8" cy="7.2" r=".6" fill="#fff"/></svg>팔로우</a>
     </div>
     <nav class="maps" id="maps" aria-label="지도 종류"></nav>
-    <label class="search">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3E4944" stroke-width="2.2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
-      <input id="q" type="search" placeholder="가게, 동네 검색" aria-label="가게 검색">
-    </label>
-  </div>
+  </header>
   <div class="chips" id="chips"></div>
 </div>
 
-<section class="sheet min" id="sheet" aria-label="가게 목록">
-  <button class="grab" id="grab" aria-label="목록 펼치기 또는 접기"><span></span></button>
+<button class="fab" id="fab" aria-controls="sheet" aria-expanded="false"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/></svg><span>목록</span><small id="fabN"></small></button>
+<section class="card" id="card" aria-live="polite"><div id="detail"></div></section>
+
+<section class="sheet" id="sheet" aria-label="가게 목록">
+  <div class="sheet-top">
+    <div class="sheet-h"><h3 id="listTitle">목록</h3><button class="toMap" id="toMap"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>목록 닫기</button></div>
+    <label class="search">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4E5968" stroke-width="2.2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+      <input id="q" type="search" placeholder="가게, 동네 검색" aria-label="가게 검색">
+    </label>
+  </div>
   <div class="sheet-body" id="body">
-    <div id="detail"></div>
-    <h3 id="listTitle">목록</h3>
+    <div id="sdetail"></div>
     <div class="list" id="list"></div>
     <div class="foot">지도 데이터 © NAVER Corp.</div>
 
@@ -165,8 +176,7 @@ h3{margin:0 0 4px;font-size:17px;font-weight:700}
 <div class="toast" id="toast" role="status"></div>
 <div class="dim" id="dim"></div>
 <section class="picker" id="picker" role="dialog" aria-modal="true" aria-labelledby="pickerT">
-  <div class="bar" aria-hidden="true"></div>
-  <div class="picker-h"><h2 id="pickerT">어떤 지도 볼까요?</h2><span>계속 늘어나요</span></div>
+  <h2 id="pickerT">어떤 지도 볼까요?</h2>
   <div class="grid" id="grid"></div>
 </section>
 
@@ -224,17 +234,15 @@ function visible() {
     (!q || [p.name, p.area, p.menu, p.memo, p.address].some(v => (v || "").toLowerCase().includes(q))));
 }
 
-const PILL_MAX = 4; // 이보다 많으면 끝에 "전체" 버튼
+const PILL_MAX = 5; // 이보다 많으면 끝에 "전체" 버튼
 function renderTabs() {
-  document.documentElement.style.setProperty("--pin", cur.color || "#0B7A50");
   const cnt = m => cache[m.id] ? cache[m.id].length : null;
   const sub = m => { const n = cnt(m); return n ? `${n}` : n === 0 ? "준비 중" : ""; };
   const nav = $("maps"); nav.innerHTML = "";
   MAPS.forEach(m => {
     const b = document.createElement("button");
     b.className = "mp" + (m === cur ? " on" : ""); b.setAttribute("aria-pressed", m === cur);
-    if (m === cur) { b.style.background = m.color; b.style.borderColor = m.color; }
-    b.innerHTML = `<i style="background:${m.color}"></i>${esc(m.name)}<small>${sub(m)}</small>`;
+    b.innerHTML = `${esc(m.name)}<small>${sub(m)}</small>`;
     b.onclick = () => { if (m !== cur) location.hash = m.id; };
     nav.appendChild(b);
   });
@@ -247,7 +255,7 @@ function renderTabs() {
   MAPS.forEach(m => {
     const b = document.createElement("button");
     b.className = "mcard" + (m === cur ? " on" : "");
-    b.innerHTML = `<span class="n"><i style="background:${m.color}"></i>${esc(m.name)}</span><span class="s">${cnt(m) ? cnt(m) + "곳" : sub(m)}</span>`;
+    b.innerHTML = `<span class="n">${esc(m.name)}</span><span class="s">${cnt(m) ? cnt(m) + "곳" : sub(m)}</span>`;
     b.onclick = () => { closePicker(); if (m !== cur) location.hash = m.id; };
     g.appendChild(b);
   });
@@ -256,7 +264,7 @@ function openPicker() { $("dim").classList.add("open"); $("picker").classList.ad
 function closePicker() { if (!$("picker").classList.contains("open")) return; $("dim").classList.remove("open"); $("picker").classList.remove("open"); }
 $("dim").onclick = closePicker;
 renderTabs();
-document.addEventListener("keydown", e => { if (e.key === "Escape") closePicker(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") { closePicker(); closeList(); } });
 function render() {
   renderTabs();
   const cnt = {}; places.forEach(p => { if (p.area) cnt[p.area] = (cnt[p.area] || 0) + 1; });
@@ -267,12 +275,14 @@ function render() {
     b.className = "chip" + (a === filter ? " on" : "");
     b.textContent = a === "전체" ? `전체 ${places.length}` : `${a} ${cnt[a]}`;
     b.setAttribute("aria-pressed", a === filter);
-    b.onclick = () => { filter = a; selId = null; $("sheet").classList.remove("min"); render(); fit(); };
+    b.onclick = () => { filter = a; selId = null; render(); fit(); };
     chips.appendChild(b);
   });
 
   const sel = places.find(x => x.id === selId);
-  const det = $("detail");
+  const inList = listMode();
+  const det = inList ? $("sdetail") : $("detail");
+  (inList ? $("detail") : $("sdetail")).innerHTML = "";
   if (sel) {
     const reel = safeUrl(sel.reel);
     det.innerHTML = `<div class="detail">
@@ -289,22 +299,25 @@ function render() {
         ${reel ? `<a class="btn reel" data-ev="reel_click" data-pid="${esc(sel.id)}" href="${esc(reel)}" target="_blank" rel="noopener">릴스</a>` : ""}
         <a class="btn line" data-ev="mapapp_click" data-pid="${esc(sel.id)}" href="${esc(mapUrl(sel))}" target="_blank" rel="noopener">지도 앱</a>
       </div>
-    </div><div class="gap"></div>`;
+    </div>`;
     $("closeSel").onclick = () => { selId = null; render(); };
   } else det.innerHTML = "";
+  $("card").classList.toggle("show", !!sel && !inList);
+  placeFab();
 
-  const shown = visible().filter(p => p.id !== selId);
-  const label = filter === "전체" ? (sel ? `${sel.area} ${cur.name}` : cur.name) : `${filter} ${cur.name}`;
-  const listSrc = sel && filter === "전체" ? shown.filter(p => p.area === sel.area) : shown;
-  $("listTitle").textContent = sel ? `${label} ${listSrc.length}곳 더` : `${label} ${listSrc.length}곳`;
+  const listSrc = visible();
+  const label = filter === "전체" ? cur.name : `${filter} ${cur.name}`;
+  $("listTitle").textContent = `${label} ${listSrc.length}곳`;
+  $("fabN").textContent = places.length ? listSrc.length : "";
   const list = $("list"); list.innerHTML = "";
   if (!places.length) list.innerHTML = `<div class="empty">${esc(cur.name)} 지도는 곧 업데이트돼요. 인스타 팔로우하고 기다려 주세요!</div>`;
   else if (!listSrc.length) list.innerHTML = `<div class="empty">조건에 맞는 가게가 없어요. 검색어나 동네를 바꿔 보세요.</div>`;
   listSrc.forEach(p => {
     const r = document.createElement("button"); r.className = "row";
     const addr = (p.address || "").split(" ").slice(2).join(" ") || p.address || "";
-    r.innerHTML = `<span class="t"><span class="n">${esc(p.name)}</span><span class="m"><b>${esc(p.type)}</b>${esc(addr)}</span></span>
+    r.innerHTML = `<span class="t"><span class="n">${esc(p.name)}</span><span class="m"><b>${esc(p.type)}</b>${esc(p.area && p.area !== "서울 밖" ? p.area + " " : "")}${esc(addr)}</span></span>
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8A948F" stroke-width="2" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>`;
+    if (p.id === selId) r.classList.add("on");
     r.onclick = () => select(p.id, true);
     list.appendChild(r);
   });
@@ -312,15 +325,29 @@ function render() {
 }
 
 function select(id, pan) {
-  selId = id; $("sheet").classList.remove("min"); render();
-  $("body").scrollTop = 0;
+  selId = id; if (listMode()) closeList(); else render();
   const p = places.find(x => x.id === id);
   track("place_open", p);
   if (!p || !pan || !map) return;
   map.setZoom(Math.max(map.getZoom(), 16)); map.setCenter(new naver.maps.LatLng(p.lat, p.lng));
-  if (window.innerWidth >= 768) map.panBy(new naver.maps.Point(-230, 0));
-  else map.panBy(new naver.maps.Point(0, window.innerHeight / 2 - (topH() + window.innerHeight * 0.52) / 2));
+  if (wideScr()) map.panBy(new naver.maps.Point(-230, 0));
+  else {
+    const bottom = listMode() ? $("sheet").getBoundingClientRect().top : window.innerHeight - $("card").offsetHeight - 24;
+    map.panBy(new naver.maps.Point(0, window.innerHeight / 2 - (topH() + bottom) / 2));
+  }
 }
+/* 목록 화면 열기·닫기 + 목록 버튼 위치 */
+const wideScr = () => window.innerWidth >= 768;
+const listMode = () => !wideScr() && $("sheet").classList.contains("open");
+function openList() { $("sheet").classList.add("open"); $("fab").setAttribute("aria-expanded", "true"); $("fab").style.visibility = "hidden"; $("body").scrollTop = 0; render(); }
+function closeList() { $("sheet").classList.remove("open"); $("fab").setAttribute("aria-expanded", "false"); $("fab").style.visibility = ""; render(); }
+function placeFab() {
+  const c = $("card");
+  $("fab").style.bottom = c.classList.contains("show") && !wideScr() ? `calc(env(safe-area-inset-bottom) + ${c.offsetHeight + 28}px)` : "";
+  document.documentElement.style.setProperty("--top-h", $("top").getBoundingClientRect().bottom + "px");
+}
+$("fab").onclick = openList; $("toMap").onclick = closeList;
+window.addEventListener("resize", placeFab);
 
 /* ----- map ----- */
 const mkHtml = (p, sel) => `<div class="mk${sel ? " sel" : ""}"><span class="lb">${esc(p.name)}</span><span class="dot"></span></div>`;
@@ -350,14 +377,14 @@ function fit(list) {
   const lats = vis.map(p => p.lat), lngs = vis.map(p => p.lng);
   const wide = window.innerWidth >= 768;
   map.fitBounds(new naver.maps.LatLngBounds(new naver.maps.LatLng(Math.min(...lats), Math.min(...lngs)), new naver.maps.LatLng(Math.max(...lats), Math.max(...lngs))),
-    wide ? { top: 40, right: 40, bottom: 40, left: 460 } : { top: topH(), right: 30, bottom: window.innerHeight * 0.5, left: 30 });
+    wide ? { top: 40, right: 40, bottom: 40, left: 480 } : { top: topH(), right: 40, bottom: 130, left: 40 });
 }
 function initialView() {
   if (!map) return;
   if (filter !== "전체" || query) return fit();
-  const wide = window.innerWidth >= 768, sh = $("sheet").getBoundingClientRect();
+  const wide = wideScr();
   map.setCenter(new naver.maps.LatLng(37.548, 126.99)); map.setZoom(wide ? 13 : 12);
-  map.panBy(new naver.maps.Point(wide ? -230 : 0, wide ? 0 : -((topH() + sh.top) / 2 - window.innerHeight / 2)));
+  map.panBy(new naver.maps.Point(wide ? -230 : 0, wide ? 0 : -((topH() + window.innerHeight) / 2 - window.innerHeight / 2)));
 }
 
 window.initMap = function () {
@@ -376,7 +403,6 @@ function startMap() {
     if (isAdmin) { setTemp(e.coord.lat(), e.coord.lng()); return; }
     if (selId) { selId = null; render(); }
   });
-  naver.maps.Event.addListener(map, "dragstart", () => { if (window.innerWidth < 768) $("sheet").classList.add("min"); });
   render(); initialView();
 }
 window.navermap_authFailure = function () {
@@ -389,8 +415,7 @@ window.navermap_authFailure = function () {
   document.head.appendChild(s);
 })();
 
-$("grab").onclick = () => $("sheet").classList.toggle("min");
-$("q").addEventListener("input", e => { query = e.target.value; selId = null; $("sheet").classList.remove("min"); render(); });
+$("q").addEventListener("input", e => { query = e.target.value; render(); });
 
 /* ----- admin helper ----- */
 let tmp = null;
