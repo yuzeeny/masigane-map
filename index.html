@@ -23,6 +23,7 @@ button,input{font-family:inherit}
 .top>*{pointer-events:auto}
 .head{background:#fff;padding:calc(env(safe-area-inset-top) + 20px) 20px 0;display:flex;flex-direction:column;gap:14px;box-shadow:0 1px 0 var(--line)}
 .head-row{display:flex;justify-content:space-between;align-items:flex-end;gap:12px}
+h1 .acc{color:var(--pink)}
 .handle{margin:0 0 6px;font-size:14px;font-weight:600;color:var(--mute);letter-spacing:0}
 h1{margin:0;font-size:clamp(24px,7vw,30px);font-weight:700;letter-spacing:-1.2px;line-height:1.2;white-space:nowrap}
 .follow{flex:none;height:44px;padding:0 16px 0 13px;border-radius:22px;background:var(--pink);color:#fff;text-decoration:none;font-size:15px;font-weight:700;display:flex;align-items:center;gap:6px;margin-top:2px}
@@ -133,7 +134,7 @@ h3{margin:0;font-size:24px;font-weight:700;letter-spacing:-.7px}
 <div class="top" id="top">
   <header class="head">
     <div class="head-row">
-      <div><p class="handle">@masigane_masiga</p><h1>마시가네 맛집 지도</h1></div>
+      <div><p class="handle">@masigane_masiga</p><h1>마시가네 <span class="acc">맛집</span> 지도</h1></div>
       <a class="follow" data-ev="insta_click" href="https://www.instagram.com/masigane_masiga/" target="_blank" rel="noopener" aria-label="마시가네 인스타그램 팔로우"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="5"/><circle cx="12" cy="12" r="3.6"/><circle cx="16.8" cy="7.2" r=".6" fill="#fff"/></svg>팔로우</a>
     </div>
     <nav class="maps" id="maps" aria-label="지도 종류"></nav>
