@@ -319,14 +319,14 @@ function render() {
     r.innerHTML = `<span class="t"><span class="n">${esc(p.name)}</span><span class="m"><b>${esc(p.type)}</b>${esc(p.area && p.area !== "서울 밖" ? p.area + " " : "")}${esc(addr)}</span></span>
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8A948F" stroke-width="2" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>`;
     if (p.id === selId) r.classList.add("on");
-    r.onclick = () => { select(p.id, true); $("body").scrollTop = 0; };
+    r.onclick = () => select(p.id, true);
     list.appendChild(r);
   });
   syncMarkers();
 }
 
 function select(id, pan) {
-  selId = id; render();
+  selId = id; if (listMode()) closeList(); else render();
   const p = places.find(x => x.id === id);
   track("place_open", p);
   if (!p || !pan || !map) return;
