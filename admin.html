@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>마시가네 맛집 지도 관리자</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0E1512;--sub:#3E4944;--mute:#6B7570;--line:#E3E8E5;--soft:#F2F4F3;--green:#0B7A50;--green-l:#E3F3EB;--pink:#D6245F}
+*{box-sizing:border-box}
+body{margin:0;font-family:"IBM Plex Sans KR",system-ui,sans-serif;color:var(--ink);background:var(--soft)}
+button,input,select{font-family:inherit;font-size:15px}
+:focus-visible{outline:3px solid var(--green);outline-offset:2px}
+.wrap{max-width:1080px;margin:0 auto;padding:20px 16px 48px}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+h1{margin:0;font-size:22px;letter-spacing:-.5px}
+h1 small{display:block;font-size:13px;color:var(--mute);font-weight:500;letter-spacing:0}
+.seg{display:flex;background:#fff;border:1px solid var(--line);border-radius:10px;padding:3px;gap:2px}
+.seg button{border:0;background:none;padding:8px 12px;border-radius:7px;color:var(--sub);font-weight:600;cursor:pointer}
+.seg button.on{background:var(--ink);color:#fff}
+.ctrl{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.ghost{border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 12px;cursor:pointer;font-weight:600;color:var(--sub)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px}
+.kpi{background:#fff;border-radius:14px;padding:14px 16px;border:1px solid var(--line)}
+.kpi .l{font-size:13px;color:var(--mute);font-weight:600}
+.kpi .v{font-size:28px;font-weight:700;letter-spacing:-.8px;margin-top:4px}
+.kpi.pink .v{color:var(--pink)}
+.card{background:#fff;border-radius:14px;border:1px solid var(--line);padding:16px;margin-bottom:14px}
+.card h2{margin:0 0 12px;font-size:16px}
+.grid2{display:grid;grid-template-columns:2fr 1fr;gap:14px}
+@media (max-width:820px){.grid2{grid-template-columns:1fr}}
+.chart{display:flex;align-items:flex-end;gap:4px;height:180px;padding-top:8px;overflow-x:auto}
+.bar{flex:1 0 14px;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:14px}
+.bar .b{width:100%;background:var(--green);border-radius:4px 4px 0 0;min-height:2px}
+.bar .d{font-size:10px;color:var(--mute);white-space:nowrap}
+.bar .n{font-size:10px;color:var(--sub);font-weight:600}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:right;padding:9px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+th:first-child,td:first-child,th:nth-child(2),td:nth-child(2){text-align:left}
+th{font-size:12px;color:var(--mute);font-weight:600;cursor:pointer;user-select:none}
+th.on{color:var(--ink)}
+td.name{font-weight:600;max-width:240px;overflow:hidden;text-overflow:ellipsis}
+.tbl{overflow-x:auto}
+.list{display:flex;flex-direction:column;gap:6px;font-size:14px}
+.list div{display:flex;justify-content:space-between;gap:8px}
+.list span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.muted{color:var(--mute);font-size:13px}
+.login{max-width:380px;margin:12vh auto;background:#fff;border-radius:16px;padding:24px;border:1px solid var(--line)}
+.login h1{margin-bottom:6px}
+.login label{display:block;font-size:13px;color:var(--sub);margin:14px 0 6px;font-weight:600}
+.login input{width:100%;border:1px solid #C8D0CB;border-radius:10px;padding:11px 12px;font-size:16px}
+.primary{width:100%;margin-top:18px;height:48px;border:0;border-radius:12px;background:var(--green);color:#fff;font-weight:700;font-size:16px;cursor:pointer}
+.err{color:#B3261E;font-size:14px;margin-top:10px;min-height:20px}
+.empty{padding:20px;text-align:center;color:var(--mute)}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* ===== 설정 (index.html과 같은 값) ===== */
+const SUPA_URL = "https://qcrnllwyquqsvebxxwyl.supabase.co";
+const SUPA_KEY = "sb_publishable_gfYEhAJYkvEvbgfG1FNV1g_4M2QXUAB";
+const MAPS = { yajang: "야장", bangeo: "방어" };
+/* ====================================== */
+
+const $app = document.getElementById("app");
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const fmt = n => (n || 0).toLocaleString("ko-KR");
+if (!SUPA_URL || !SUPA_KEY) { $app.innerHTML = `<div class="login"><h1>설정이 필요해요</h1><p class="muted">admin.html의 SUPA_URL, SUPA_KEY를 채워 주세요.</p></div>`; throw 0; }
+const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
+
+let range = 7, mapF = "all", sortKey = "opens", data = null;
+
+function loginView(msg) {
+  $app.innerHTML = `<form class="login" id="lf">
+    <h1>마시가네 관리자</h1><p class="muted">맛집 지도 방문·클릭 통계</p>
+    <label for="em">이메일</label><input id="em" type="email" autocomplete="username" required>
+    <label for="pw">비밀번호</label><input id="pw" type="password" autocomplete="current-password" required>
+    <button class="primary" type="submit">로그인</button>
+    <div class="err" id="er">${esc(msg || "")}</div></form>`;
+  document.getElementById("lf").onsubmit = async e => {
+    e.preventDefault();
+    const { error } = await sb.auth.signInWithPassword({ email: em.value.trim(), password: pw.value });
+    if (error) document.getElementById("er").textContent = "이메일이나 비밀번호가 맞지 않아요.";
+    else load();
+  };
+}
+
+async function load() {
+  const since = range ? new Date(Date.now() - range * 86400000) : new Date("2020-01-01");
+  if (range === 1) since.setHours(0, 0, 0, 0);
+  $app.innerHTML = `<div class="wrap"><p class="muted">불러오는 중…</p></div>`;
+  const { data: d, error } = await sb.rpc("admin_stats", { since: since.toISOString(), map_filter: mapF === "all" ? null : mapF });
+  if (error) { if (/JWT|auth|permission/i.test(error.message)) return loginView("다시 로그인해 주세요."); $app.innerHTML = `<div class="wrap"><p class="err">통계를 불러오지 못했어요: ${esc(error.message)}</p></div>`; return; }
+  data = d; view();
+}
+
+function view() {
+  const t = data.totals || {};
+  const daily = data.daily || [];
+  const max = Math.max(1, ...daily.map(x => x.views));
+  const places = [...(data.places || [])].sort((a, b) => (b[sortKey] || 0) - (a[sortKey] || 0));
+  const segR = [[1, "오늘"], [7, "7일"], [30, "30일"], [0, "전체"]].map(([v, l]) => `<button data-r="${v}" class="${v === range ? "on" : ""}">${l}</button>`).join("");
+  const segM = [["all", "전체 지도"], ...Object.entries(MAPS)].map(([v, l]) => `<button data-m="${v}" class="${v === mapF ? "on" : ""}">${l}</button>`).join("");
+  const th = (k, l) => `<th data-s="${k}" class="${k === sortKey ? "on" : ""}">${l}${k === sortKey ? " ▼" : ""}</th>`;
+  $app.innerHTML = `<div class="wrap">
+    <header><h1>마시가네 맛집 지도 관리자<small>방문·클릭 통계</small></h1>
+      <div class="ctrl"><div class="seg">${segR}</div><div class="seg">${segM}</div><button class="ghost" id="out">로그아웃</button></div></header>
+    <section class="kpis">
+      <div class="kpi"><div class="l">페이지 방문</div><div class="v">${fmt(t.page_view)}</div></div>
+      <div class="kpi"><div class="l">방문자 수</div><div class="v">${fmt(data.visitors)}</div></div>
+      <div class="kpi"><div class="l">가게 열람</div><div class="v">${fmt(t.place_open)}</div></div>
+      <div class="kpi"><div class="l">가게 정보·리뷰 클릭</div><div class="v">${fmt(t.info_click)}</div></div>
+      <div class="kpi"><div class="l">지도 앱 클릭</div><div class="v">${fmt(t.mapapp_click)}</div></div>
+      <div class="kpi pink"><div class="l">인스타 팔로우 클릭</div><div class="v">${fmt(t.insta_click)}</div></div>
+    </section>
+    <div class="grid2">
+      <section class="card"><h2>날짜별 방문</h2>
+        ${daily.length ? `<div class="chart" role="img" aria-label="날짜별 페이지 방문 수">${daily.map(x => `<div class="bar" title="${x.day}: 방문 ${x.views}, 방문자 ${x.visitors}, 인스타 ${x.insta}"><span class="n">${x.views}</span><span class="b" style="height:${Math.round(x.views / max * 140)}px"></span><span class="d">${x.day.slice(5)}</span></div>`).join("")}</div>` : `<div class="empty">아직 기록이 없어요</div>`}
+      </section>
+      <section class="card"><h2>지도별 · 유입 경로</h2>
+        <div class="list">${(data.maps || []).map(m => `<div><span>${esc(MAPS[m.map] || m.map)} 지도</span><b>${fmt(m.views)}</b></div>`).join("") || `<span class="muted">기록 없음</span>`}</div>
+        <h2 style="margin-top:18px">어디서 들어왔나</h2>
+        <div class="list">${(data.refs || []).map(r => `<div><span>${esc(r.ref)}</span><b>${fmt(r.c)}</b></div>`).join("") || `<span class="muted">기록 없음</span>`}</div>
+      </section>
+    </div>
+    <section class="card"><h2>가게별 클릭</h2>
+      ${places.length ? `<div class="tbl"><table><thead><tr><th>가게</th><th>지도</th>${th("opens", "열람")}${th("info", "정보·리뷰")}${th("mapapp", "지도 앱")}${th("reel", "릴스")}</tr></thead>
+      <tbody>${places.slice(0, 100).map(p => `<tr><td class="name">${esc(p.name)}</td><td>${esc(MAPS[p.map] || p.map)}</td><td>${fmt(p.opens)}</td><td>${fmt(p.info)}</td><td>${fmt(p.mapapp)}</td><td>${fmt(p.reel)}</td></tr>`).join("")}</tbody></table></div>`
+      : `<div class="empty">아직 가게를 누른 기록이 없어요</div>`}
+    </section>
+  </div>`;
+  $app.querySelectorAll("[data-r]").forEach(b => b.onclick = () => { range = +b.dataset.r; load(); });
+  $app.querySelectorAll("[data-m]").forEach(b => b.onclick = () => { mapF = b.dataset.m; load(); });
+  $app.querySelectorAll("[data-s]").forEach(b => b.onclick = () => { sortKey = b.dataset.s; view(); });
+  document.getElementById("out").onclick = async () => { await sb.auth.signOut(); loginView(); };
+}
+
+sb.auth.getSession().then(({ data: { session } }) => session ? load() : loginView());
+</script>
+</body>
+</html>
