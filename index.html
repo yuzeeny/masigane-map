@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--pin:#0E1512;--ink:#0E1512;--sub:#4E5968;--mute:#8B95A1;--line:#ECEEF0;--soft:#F2F4F6;--green:#0B7A50;--green-d:#08643F;--green-l:#E3F3EB;--pink:#D6245F}
+:root{--pin:#D6245F;--ink:#0E1512;--sub:#4E5968;--mute:#8B95A1;--line:#ECEEF0;--soft:#F2F4F6;--green:#0B7A50;--green-d:#08643F;--green-l:#E3F3EB;--pink:#D6245F}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;height:100%;overflow:hidden;font-family:"IBM Plex Sans KR",system-ui,sans-serif;color:var(--ink);background:#EEF1EF}
 button,input{font-family:inherit}
@@ -22,10 +22,10 @@ button,input{font-family:inherit}
 .top{position:fixed;left:0;right:0;top:0;z-index:20;display:flex;flex-direction:column;gap:12px;pointer-events:none}
 .top>*{pointer-events:auto}
 .head{background:#fff;padding:calc(env(safe-area-inset-top) + 20px) 20px 0;display:flex;flex-direction:column;gap:14px;box-shadow:0 1px 0 var(--line)}
-.head-row{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.head-row{display:flex;justify-content:space-between;align-items:flex-end;gap:12px}
 .handle{margin:0 0 6px;font-size:14px;font-weight:600;color:var(--mute);letter-spacing:0}
-h1{margin:0;font-size:32px;font-weight:700;letter-spacing:-1.4px;line-height:1.12}
-.follow{flex:none;height:44px;padding:0 16px 0 13px;border-radius:22px;background:var(--ink);color:#fff;text-decoration:none;font-size:15px;font-weight:700;display:flex;align-items:center;gap:6px;margin-top:2px}
+h1{margin:0;font-size:clamp(24px,7vw,30px);font-weight:700;letter-spacing:-1.2px;line-height:1.2;white-space:nowrap}
+.follow{flex:none;height:44px;padding:0 16px 0 13px;border-radius:22px;background:var(--pink);color:#fff;text-decoration:none;font-size:15px;font-weight:700;display:flex;align-items:center;gap:6px;margin-top:2px}
 .maps{display:flex;gap:24px;overflow-x:auto;scrollbar-width:none;margin:0 -20px;padding:0 20px}
 .maps::-webkit-scrollbar{display:none}
 .mp{flex:none;border:0;background:none;padding:2px 0 12px;font:700 19px "IBM Plex Sans KR",sans-serif;letter-spacing:-.4px;color:#B4BBC2;cursor:pointer;border-bottom:3px solid transparent;display:flex;align-items:baseline;gap:6px}
@@ -44,7 +44,7 @@ h1{margin:0;font-size:32px;font-weight:700;letter-spacing:-1.4px;line-height:1.1
 .show-labels .mk .lb{display:block;background:#fff;color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.2)}
 .mk.sel .dot{width:26px;height:26px;border-width:4px;box-shadow:0 2px 8px rgba(0,0,0,.35)}
 .mk.sel .lb{display:block;bottom:30px;background:var(--ink);color:#fff;font-size:13px;padding:5px 10px}
-.mk.temp .dot{background:var(--pink)}
+.mk.temp .dot{background:var(--ink)}
 
 /* list button (FAB) */
 .fab{position:fixed;right:20px;bottom:calc(env(safe-area-inset-bottom) + 24px);z-index:35;width:84px;height:84px;border-radius:50%;border:0;background:var(--ink);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font:700 15px "IBM Plex Sans KR",sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.3);cursor:pointer;transition:bottom .2s ease}
@@ -133,7 +133,7 @@ h3{margin:0;font-size:24px;font-weight:700;letter-spacing:-.7px}
 <div class="top" id="top">
   <header class="head">
     <div class="head-row">
-      <div><p class="handle">@masigane_masiga</p><h1>마시가네<br>맛집 지도</h1></div>
+      <div><p class="handle">@masigane_masiga</p><h1>마시가네 맛집 지도</h1></div>
       <a class="follow" data-ev="insta_click" href="https://www.instagram.com/masigane_masiga/" target="_blank" rel="noopener" aria-label="마시가네 인스타그램 팔로우"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="5"/><circle cx="12" cy="12" r="3.6"/><circle cx="16.8" cy="7.2" r=".6" fill="#fff"/></svg>팔로우</a>
     </div>
     <nav class="maps" id="maps" aria-label="지도 종류"></nav>
