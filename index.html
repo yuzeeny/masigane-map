@@ -27,7 +27,22 @@ h1 .acc{color:var(--pink)}
 .handle{margin:0 0 6px;font-size:14px;font-weight:600;color:var(--mute);letter-spacing:0}
 h1{margin:0;font-size:clamp(24px,7vw,30px);font-weight:700;letter-spacing:-1.2px;line-height:1.2;white-space:nowrap}
 .follow{flex:none;height:44px;padding:0 16px 0 13px;border-radius:22px;background:var(--pink);color:#fff;text-decoration:none;font-size:15px;font-weight:700;display:flex;align-items:center;gap:6px;margin-top:2px}
-.maps{display:flex;gap:24px;overflow-x:auto;scrollbar-width:none;margin:0 -20px;padding:0 20px}
+.tabrow{display:flex;align-items:flex-start;gap:10px}
+.maps{flex:1;min-width:0;display:flex;gap:24px;overflow-x:auto;scrollbar-width:none;margin:0 0 0 -20px;padding:0 0 0 20px}
+.rep{flex:none;height:34px;padding:0 12px;border-radius:17px;border:1.5px solid #DDE1E5;background:#fff;color:var(--ink);font:700 14px "IBM Plex Sans KR",sans-serif;cursor:pointer;display:flex;align-items:center;gap:4px}
+.foot-rep{display:block;width:100%;margin:8px 0 4px;padding:14px;border:0;border-radius:14px;background:var(--soft);color:var(--ink);font:600 15px "IBM Plex Sans KR",sans-serif;cursor:pointer}
+.foot-rep b{color:var(--pink)}
+.report form{display:flex;flex-direction:column;gap:12px}
+.report p.sub{margin:-8px 0 0;font-size:14px;color:var(--sub);line-height:1.5}
+.report label{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600;color:var(--sub)}
+.report input,.report select,.report textarea{width:100%;border:1.5px solid #DDE1E5;border-radius:12px;padding:12px;font:500 16px "IBM Plex Sans KR",sans-serif;color:var(--ink);background:#fff}
+.report textarea{min-height:76px;resize:vertical}
+.report .hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+.report .acts2{display:flex;gap:8px;margin-top:4px}
+.report .send{flex:1;height:52px;border:0;border-radius:14px;background:var(--pink);color:#fff;font:700 16px "IBM Plex Sans KR",sans-serif;cursor:pointer}
+.report .send:disabled{opacity:.6}
+.report .cancel{flex:none;height:52px;padding:0 18px;border:0;border-radius:14px;background:var(--soft);color:var(--ink);font:700 16px "IBM Plex Sans KR",sans-serif;cursor:pointer}
+.picker.report{max-height:92vh;overflow-y:auto}
 .maps::-webkit-scrollbar{display:none}
 .mp{flex:none;border:0;background:none;padding:2px 0 12px;font:700 19px "IBM Plex Sans KR",sans-serif;letter-spacing:-.4px;color:#B4BBC2;cursor:pointer;border-bottom:3px solid transparent;display:flex;align-items:baseline;gap:6px}
 .mp small{font-size:14px;font-weight:600}
@@ -145,7 +160,7 @@ h3{margin:0;font-size:24px;font-weight:700;letter-spacing:-.7px}
       <div><p class="handle">@masigane_masiga</p><h1>마시가네 <span class="acc">맛집</span> 지도</h1></div>
       <a class="follow" data-ev="insta_click" href="https://www.instagram.com/masigane_masiga/" target="_blank" rel="noopener" aria-label="마시가네 인스타그램 팔로우"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="5"/><circle cx="12" cy="12" r="3.6"/><circle cx="16.8" cy="7.2" r=".6" fill="#fff"/></svg>팔로우</a>
     </div>
-    <nav class="maps" id="maps" aria-label="지도 종류"></nav>
+    <div class="tabrow"><nav class="maps" id="maps" aria-label="지도 종류"></nav><button class="rep" id="repBtn" aria-haspopup="dialog">+ 맛집 제보</button></div>
   </header>
   <div class="chips" id="chips"></div>
 </div>
@@ -165,6 +180,7 @@ h3{margin:0;font-size:24px;font-weight:700;letter-spacing:-.7px}
   <div class="sheet-body" id="body">
     <div id="sdetail"></div>
     <div class="list" id="list"></div>
+    <button class="foot-rep" id="repBtn2">찾는 맛집이 없나요? <b>마시가네에 제보하기</b></button>
     <div class="foot">지도 데이터 © NAVER Corp.</div>
 
     <section class="admin" id="admin">
@@ -185,6 +201,19 @@ h3{margin:0;font-size:24px;font-weight:700;letter-spacing:-.7px}
 </section>
 <div class="toast" id="toast" role="status"></div>
 <div class="dim" id="dim"></div>
+<section class="picker report" id="report" role="dialog" aria-modal="true" aria-labelledby="reportT">
+  <h2 id="reportT">맛집 제보하기</h2>
+  <p class="sub">알려주신 곳은 마시가네가 직접 확인하고 지도에 올려요.</p>
+  <form id="repForm">
+    <label>가게 이름 *<input name="name" required maxlength="100" autocomplete="off" placeholder="예) 바다회사랑 홍대점"></label>
+    <label>어떤 지도에 어울려요?<select name="map" id="repMap"></select></label>
+    <label>네이버 지도 링크 또는 주소<input name="link" maxlength="500" autocomplete="off" placeholder="naver.me/... 또는 주소"></label>
+    <label>추천 이유<textarea name="note" maxlength="500" placeholder="뭐가 맛있는지, 분위기는 어떤지"></textarea></label>
+    <label>인스타 아이디 (선택)<input name="contact" maxlength="60" autocomplete="off" placeholder="@아이디 — 소개할 때 언급해 드릴게요"></label>
+    <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <div class="acts2"><button type="button" class="cancel" id="repCancel">취소</button><button type="submit" class="send" id="repSend">제보 보내기</button></div>
+  </form>
+</section>
 <section class="picker" id="picker" role="dialog" aria-modal="true" aria-labelledby="pickerT">
   <h2 id="pickerT">어떤 지도 볼까요?</h2>
   <div class="grid" id="grid"></div>
@@ -486,7 +515,34 @@ function out() {
 TYPES.forEach(t => { const o = document.createElement("option"); o.value = t; o.textContent = t; $("a_type").appendChild(o); });
 ["name", "area", "type", "menu", "memo", "naver", "reel"].forEach(k => $("a_" + k).addEventListener("input", out));
 $("a_copy").onclick = async () => { try { await navigator.clipboard.writeText($("a_out").textContent); toast("복사했어요"); } catch { toast("복사하지 못했어요. 직접 선택해서 복사해 주세요"); } };
-let tt; function toast(m) { const t = $("toast"); t.textContent = m; t.classList.add("show"); clearTimeout(tt); tt = setTimeout(() => t.classList.remove("show"), 2000); }
+/* ----- 맛집 제보 ----- */
+function openReport() {
+  const sel = $("repMap"); sel.innerHTML = "";
+  [...MAPS.map(m => [m.id, m.name]), ["etc", "기타 / 잘 모르겠어요"]].forEach(([v, l]) => { const o = document.createElement("option"); o.value = v; o.textContent = l; if (v === cur.id) o.selected = true; sel.appendChild(o); });
+  $("dim").classList.add("open"); $("report").classList.add("open"); $("repForm").name.focus();
+}
+function closeReport() { $("report").classList.remove("open"); if (!$("picker").classList.contains("open")) $("dim").classList.remove("open"); }
+$("repBtn").onclick = openReport; $("repBtn2").onclick = openReport; $("repCancel").onclick = closeReport;
+$("dim").addEventListener("click", closeReport);
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeReport(); });
+$("repForm").onsubmit = async e => {
+  e.preventDefault();
+  const f = e.target, v = k => f[k].value.trim();
+  if (v("website")) { closeReport(); return; }
+  if (!v("name")) { f.name.focus(); return; }
+  if (!SUPA_URL || !SUPA_KEY) { toast("지금은 제보를 받을 수 없어요"); return; }
+  const btn = $("repSend"); btn.disabled = true; btn.textContent = "보내는 중…";
+  try {
+    const r = await fetch(`${SUPA_URL}/rest/v1/reports`, { method: "POST",
+      headers: { apikey: SUPA_KEY, "Content-Type": "application/json", Prefer: "return=minimal" },
+      body: JSON.stringify({ name: v("name"), map: f.map.value, link: v("link") || null, note: v("note") || null, contact: v("contact") || null }) });
+    if (!r.ok) throw 0;
+    f.reset(); closeReport(); toast("제보 고마워요! 확인하고 지도에 올릴게요");
+  } catch { toast("보내지 못했어요. 잠시 후 다시 시도해 주세요"); }
+  btn.disabled = false; btn.textContent = "제보 보내기";
+};
+
+let tt; function toast(m) { const t = $("toast"); t.textContent = m; t.classList.add("show"); clearTimeout(tt); tt = setTimeout(() => t.classList.remove("show"), 2600); }
 
 /* ----- 데이터 불러오기 ----- */
 const norm = d => (Array.isArray(d) ? d : []).filter(p => p && p.name && isFinite(p.lat) && isFinite(p.lng))
