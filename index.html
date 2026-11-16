@@ -49,6 +49,13 @@ h1{margin:0;font-size:clamp(24px,7vw,30px);font-weight:700;letter-spacing:-1.2px
 
 /* list button (FAB) */
 .fab{position:fixed;right:20px;bottom:calc(env(safe-area-inset-bottom) + 24px);z-index:35;width:84px;height:84px;border-radius:50%;border:0;background:var(--ink);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font:700 15px "IBM Plex Sans KR",sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.3);cursor:pointer;transition:bottom .2s ease}
+.loc{position:fixed;right:34px;bottom:calc(env(safe-area-inset-bottom) + 120px);z-index:35;width:56px;height:56px;border-radius:50%;border:0;background:#fff;color:var(--ink);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.22);cursor:pointer;transition:bottom .2s ease}
+.loc.on{color:#2F6FDB}
+.loc.busy svg{animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.me{width:24px;height:24px;border-radius:50%;background:rgba(47,111,219,.22);display:flex;align-items:center;justify-content:center}
+.me span{width:14px;height:14px;border-radius:50%;background:#2F6FDB;border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.35)}
+.km{flex:none;font-size:14px;font-weight:700;color:var(--ink)}
 .fab small{font-size:12px;font-weight:600;opacity:.75}
 
 /* place card */
@@ -121,10 +128,11 @@ h3{margin:0;font-size:24px;font-weight:700;letter-spacing:-.7px}
   .sheet{left:16px;right:auto;top:auto;bottom:16px;width:440px;height:calc(100vh - var(--top-h, 240px) - 28px);border-radius:24px;transform:none;visibility:visible;box-shadow:0 4px 20px rgba(14,21,18,.10)}
   .sheet-top{padding-top:18px}
   .toMap,.fab{display:none}
+  .loc{right:24px;top:24px;bottom:auto}
   .card{left:auto;right:24px;width:380px;bottom:24px}
   .picker{left:50%;right:auto;bottom:auto;top:50%;transform:translate(-50%,-50%);width:440px;border-radius:24px}
 }
-@media (prefers-reduced-motion:reduce){.sheet,.fab{transition:none}}
+@media (prefers-reduced-motion:reduce){.sheet,.fab,.loc{transition:none}.loc.busy svg{animation:none}}
 </style>
 </head>
 <body>
@@ -142,6 +150,7 @@ h3{margin:0;font-size:24px;font-weight:700;letter-spacing:-.7px}
   <div class="chips" id="chips"></div>
 </div>
 
+<button class="loc" id="loc" aria-label="내 위치로 이동"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button>
 <button class="fab" id="fab" aria-controls="sheet" aria-expanded="false"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/></svg><span>목록</span><small id="fabN"></small></button>
 <section class="card" id="card" aria-live="polite"><div id="detail"></div></section>
 
@@ -288,7 +297,7 @@ function render() {
     const reel = safeUrl(sel.reel);
     det.innerHTML = `<div class="detail">
       <div class="d-head">
-        <div class="d-row"><span class="tag">${esc(sel.type)}</span>
+        <div class="d-row"><span class="tag">${esc(sel.type)}${me ? ` · 여기서 ${fmtKm(distKm(sel))}` : ""}</span>
           <button class="close" id="closeSel" aria-label="닫기"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0E1512" stroke-width="2.4" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
         <h2>${esc(sel.name)}</h2>
         ${sel.address ? `<p class="addr">${esc(sel.address)}</p>` : ""}
@@ -306,9 +315,9 @@ function render() {
   $("card").classList.toggle("show", !!sel && !inList);
   placeFab();
 
-  const listSrc = visible();
+  const listSrc = me ? visible().map(p => ({ ...p, _d: distKm(p) })).sort((a, b) => a._d - b._d) : visible();
   const label = filter === "전체" ? cur.name : `${filter} ${cur.name}`;
-  $("listTitle").textContent = `${label} ${listSrc.length}곳`;
+  $("listTitle").textContent = `${label} ${listSrc.length}곳${me && listSrc.length ? " · 가까운 순" : ""}`;
   $("fabN").textContent = places.length ? listSrc.length : "";
   const list = $("list"); list.innerHTML = "";
   if (!places.length) list.innerHTML = `<div class="empty">${esc(cur.name)} 지도는 곧 업데이트돼요. 인스타 팔로우하고 기다려 주세요!</div>`;
@@ -317,7 +326,7 @@ function render() {
     const r = document.createElement("button"); r.className = "row";
     const addr = (p.address || "").split(" ").slice(2).join(" ") || p.address || "";
     r.innerHTML = `<span class="t"><span class="n">${esc(p.name)}</span><span class="m"><b>${esc(p.type)}</b>${esc(p.area && p.area !== "서울 밖" ? p.area + " " : "")}${esc(addr)}</span></span>
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8A948F" stroke-width="2" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>`;
+      ${me ? `<span class="km">${fmtKm(p._d)}</span>` : `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8A948F" stroke-width="2" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>`}`;
     if (p.id === selId) r.classList.add("on");
     r.onclick = () => select(p.id, true);
     list.appendChild(r);
@@ -344,10 +353,51 @@ function openList() { $("sheet").classList.add("open"); $("fab").setAttribute("a
 function closeList() { $("sheet").classList.remove("open"); $("fab").setAttribute("aria-expanded", "false"); $("fab").style.visibility = ""; render(); }
 function placeFab() {
   const c = $("card");
-  $("fab").style.bottom = c.classList.contains("show") && !wideScr() ? `calc(env(safe-area-inset-bottom) + ${c.offsetHeight + 28}px)` : "";
+  const up = c.classList.contains("show") && !wideScr();
+  $("fab").style.bottom = up ? `calc(env(safe-area-inset-bottom) + ${c.offsetHeight + 28}px)` : "";
+  $("loc").style.bottom = wideScr() ? "" : `calc(env(safe-area-inset-bottom) + ${(up ? c.offsetHeight + 28 : 24) + 96}px)`;
   document.documentElement.style.setProperty("--top-h", $("top").getBoundingClientRect().bottom + "px");
 }
 $("fab").onclick = openList; $("toMap").onclick = closeList;
+/* 현재 위치 */
+let me = null, meMarker = null, watchId = null;
+const R2 = x => x * Math.PI / 180;
+function distKm(p) {
+  if (!me) return null;
+  const dLat = R2(p.lat - me.lat), dLng = R2(p.lng - me.lng);
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(R2(me.lat)) * Math.cos(R2(p.lat)) * Math.sin(dLng / 2) ** 2;
+  return 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+const fmtKm = d => d == null ? "" : d < 10 ? `${d.toFixed(1)}km` : `${Math.round(d)}km`;
+function drawMe() {
+  if (!map || !me) return;
+  const pos = new naver.maps.LatLng(me.lat, me.lng);
+  if (!meMarker) meMarker = new naver.maps.Marker({ position: pos, map, zIndex: 2000, clickable: false, icon: { content: '<div class="me"><span></span></div>', anchor: new naver.maps.Point(12, 12) } });
+  else meMarker.setPosition(pos);
+}
+function goMe() {
+  if (!map || !me) return;
+  map.setZoom(Math.max(map.getZoom(), 15)); map.setCenter(new naver.maps.LatLng(me.lat, me.lng));
+  if (wideScr()) map.panBy(new naver.maps.Point(-230, 0));
+  else map.panBy(new naver.maps.Point(0, window.innerHeight / 2 - (topH() + window.innerHeight) / 2));
+}
+function locate(move) {
+  const b = $("loc");
+  if (!navigator.geolocation) { if (move) toast("이 브라우저는 위치를 지원하지 않아요"); return; }
+  if (move && me) goMe();
+  b.classList.add("busy");
+  navigator.geolocation.getCurrentPosition(pos => {
+    b.classList.remove("busy"); b.classList.add("on");
+    const first = !me;
+    me = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+    drawMe(); if (move) goMe(); if (first) render();
+    if (watchId == null) watchId = navigator.geolocation.watchPosition(p => { me = { lat: p.coords.latitude, lng: p.coords.longitude }; drawMe(); }, () => {}, { enableHighAccuracy: true, maximumAge: 30000 });
+  }, () => {
+    b.classList.remove("busy");
+    if (move) toast("위치 권한을 허용하면 내 위치와 거리를 볼 수 있어요");
+  }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 });
+}
+$("loc").onclick = () => locate(true);
 window.addEventListener("resize", placeFab);
 
 /* ----- map ----- */
@@ -404,7 +454,7 @@ function startMap() {
     if (isAdmin) { setTemp(e.coord.lat(), e.coord.lng()); return; }
     if (selId) { selId = null; render(); }
   });
-  render(); initialView();
+  render(); initialView(); drawMe();
 }
 window.navermap_authFailure = function () {
   $("map").innerHTML = `<div class="mapmsg">지도 인증에 실패했어요. 네이버 클라우드 콘솔에서 이 사이트 주소가 서비스 URL로 등록돼 있는지 확인해 주세요.</div>`;
@@ -455,6 +505,7 @@ function show(m, first) {
 }
 window.addEventListener("hashchange", () => { const m = MAPS.find(x => "#" + x.id === location.hash) || MAPS[0]; if (m !== cur) show(m, false); });
 Promise.all(MAPS.map(load)).then(renderTabs);
+locate(false);
 show(cur, true);
 </script>
 </body>
