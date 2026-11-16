@@ -548,8 +548,12 @@ let tt; function toast(m) { const t = $("toast"); t.textContent = m; t.classList
 const norm = d => (Array.isArray(d) ? d : []).filter(p => p && p.name && isFinite(p.lat) && isFinite(p.lng))
   .map((p, i) => ({ ...p, id: p.id || "p" + i, lat: +p.lat, lng: +p.lng, type: TYPES.includes(p.type) ? p.type : "기타" }))
   .sort((a, b) => (a.area || "").localeCompare(b.area || "", "ko") || a.name.localeCompare(b.name, "ko"));
+// 관리자 페이지에서 제보로 추가한 가게 (Supabase places 표)
+const EXTRA = SUPA_URL && SUPA_KEY ? fetch(`${SUPA_URL}/rest/v1/places?select=id,map,name,area,type,address,naver,memo,lat,lng`, { headers: { apikey: SUPA_KEY } })
+  .then(r => r.ok ? r.json() : []).catch(() => []) : Promise.resolve([]);
 const load = m => cache[m.id] ? Promise.resolve(cache[m.id]) :
-  fetch(m.file, { cache: "no-cache" }).then(r => r.ok ? r.json() : []).catch(() => []).then(d => (cache[m.id] = norm(d)));
+  Promise.all([fetch(m.file, { cache: "no-cache" }).then(r => r.ok ? r.json() : []).catch(() => []), EXTRA])
+    .then(([d, x]) => (cache[m.id] = norm([...(Array.isArray(d) ? d : []), ...x.filter(p => p.map === m.id).map(p => ({ ...p, id: "s" + p.id }))])));
 function show(m, first) {
   cur = m; filter = "전체"; query = ""; $("q").value = ""; selId = null;
   document.title = `마시가네 ${m.name} 지도`;

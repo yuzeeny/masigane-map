@@ -65,6 +65,24 @@ td.name{font-weight:600;max-width:240px;overflow:hidden;text-overflow:ellipsis}
 .repi .bt{display:flex;gap:6px;margin-top:2px}
 .repi .bt button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 12px;font-size:13px;font-weight:600;cursor:pointer;color:var(--sub)}
 .repi .bt button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.repi .bt button.add{background:#D6245F;border-color:#D6245F;color:#fff}
+.repi .tg.added{background:#E3F3EB;color:#08643F}
+.modal{position:fixed;inset:0;z-index:50;background:rgba(14,21,18,.5);display:none;align-items:flex-end;justify-content:center}
+.modal.open{display:flex}
+.mbox{background:#fff;width:100%;max-width:560px;max-height:94vh;overflow-y:auto;border-radius:20px 20px 0 0;padding:20px;display:flex;flex-direction:column;gap:10px}
+@media (min-width:640px){.modal{align-items:center}.mbox{border-radius:20px}}
+.mbox h2{margin:0;font-size:20px}
+.mbox label{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600;color:var(--sub)}
+.mbox input,.mbox select,.mbox textarea{width:100%;min-width:0;box-sizing:border-box;border:1px solid #C8D0CB;border-radius:10px;padding:10px 12px;font-size:16px;font-family:inherit;color:var(--ink)}
+.mbox .two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
+#pmap{height:280px;border-radius:12px;overflow:hidden;background:var(--soft)}
+.mbox .hint{font-size:13px;color:var(--mute);margin:0}
+.mbox .row2{display:flex;gap:8px}
+.mbox .row2 button{flex:1;height:48px;border:0;border-radius:12px;font-weight:700;font-size:15px;cursor:pointer}
+.mbox .save{background:#D6245F;color:#fff}.mbox .save:disabled{opacity:.5}
+.mbox .cx{background:var(--soft);color:var(--ink)}
+.pk{width:20px;height:20px;border-radius:50%;background:#D6245F;border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+.added-list .repi .h b{font-size:15px}
 .ph{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
 .ph h2{margin:0}
 .pq{border:1px solid #C8D0CB;border-radius:10px;padding:8px 12px;min-width:200px}
@@ -78,6 +96,7 @@ thead th{position:sticky;top:0;background:#fff}
 <body>
 <div id="app"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=t2hlw513tp"></script>
 <script>
 /* ===== 설정 (index.html과 같은 값) ===== */
 const SUPA_URL = "https://qcrnllwyquqsvebxxwyl.supabase.co";
@@ -92,11 +111,11 @@ const fmt = n => (n || 0).toLocaleString("ko-KR");
 if (!SUPA_URL || !SUPA_KEY) { $app.innerHTML = `<div class="login"><h1>설정이 필요해요</h1><p class="muted">admin.html의 SUPA_URL, SUPA_KEY를 채워 주세요.</p></div>`; throw 0; }
 const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
 
-let range = 7, mapF = "all", sortKey = "opens", data = null, pq = "", ALL = null, REP = [], repAll = false;
+let range = 7, mapF = "all", sortKey = "opens", data = null, pq = "", ALL = null, REP = [], repAll = false, ADDED = [];
 // 지도 데이터의 모든 가게 목록 (조회 0인 가게도 표에 보이도록)
 const allPlaces = () => ALL ? Promise.resolve(ALL) : Promise.all(Object.entries(FILES).map(([m, f]) =>
   fetch(f, { cache: "no-cache" }).then(r => r.ok ? r.json() : []).catch(() => []).then(d => (Array.isArray(d) ? d : []).map(p => ({ map: m, place_id: p.id, name: p.name, area: p.area || "" })))))
-  .then(a => (ALL = a.flat()));
+  .then(a => (ALL = a.flat().concat(ADDED.map(p => ({ map: p.map, place_id: "s" + p.id, name: p.name, area: p.area || "" })))));
 
 function loginView(msg) {
   $app.innerHTML = `<form class="login" id="lf">
@@ -121,6 +140,8 @@ async function load() {
   if (error) { if (/JWT|auth|permission/i.test(error.message)) return loginView("다시 로그인해 주세요."); $app.innerHTML = `<div class="wrap"><p class="err">통계를 불러오지 못했어요: ${esc(error.message)}</p></div>`; return; }
   const rp = await sb.from("reports").select("*").order("created_at", { ascending: false }).limit(300);
   REP = rp.error ? [] : rp.data;
+  const ap = await sb.from("places").select("*").order("created_at", { ascending: false });
+  ADDED = ap.error ? [] : ap.data; ALL = null;
   await allPlaces(); data = d; view();
 }
 
@@ -178,7 +199,9 @@ function view() {
   document.getElementById("out").onclick = async () => { await sb.auth.signOut(); loginView(); };
 }
 
-const ST = { new: "새 제보", ok: "확인함", hold: "보류", no: "거절" };
+const ST = { new: "새 제보", ok: "확인함", hold: "보류", no: "거절", added: "지도에 올림" };
+const TYPES = ["노가리·호프", "포차", "고기", "해산물", "전·막걸리", "치킨", "횟집", "이자카야·바", "수산시장", "방어", "기타"];
+const GU = ["강남구","강동구","강북구","강서구","관악구","광진구","구로구","금천구","노원구","도봉구","동대문구","동작구","마포구","서대문구","서초구","성동구","성북구","송파구","양천구","영등포구","용산구","은평구","종로구","중구","중랑구","서울 밖"];
 function repView() {
   const box = document.getElementById("repCard"); if (!box) return;
   const nNew = REP.filter(r => r.status === "new").length;
@@ -188,10 +211,22 @@ function repView() {
   box.innerHTML = `<div class="ph"><h2>맛집 제보 <span class="muted">새 제보 ${nNew}건</span></h2>
     <div class="seg"><button data-ra="0" class="${repAll ? "" : "on"}">처리할 것</button><button data-ra="1" class="${repAll ? "on" : ""}">전체 ${REP.length}</button></div></div>
     ${list.length ? `<div class="reps">${list.map(r => `<div class="repi">
-      <div class="h"><b>${esc(r.name)}</b><span class="tg ${r.status === "new" ? "new" : ""}">${ST[r.status] || r.status}</span><span class="tg">${esc(MAPS[r.map] || (r.map === "etc" ? "기타" : r.map || "기타"))}</span><span class="d">${day(r.created_at)}</span></div>
+      <div class="h"><b>${esc(r.name)}</b><span class="tg ${r.status === "new" ? "new" : r.status === "added" ? "added" : ""}">${ST[r.status] || r.status}</span><span class="tg">${esc(MAPS[r.map] || (r.map === "etc" ? "기타" : r.map || "기타"))}</span><span class="d">${day(r.created_at)}</span></div>
       ${r.link ? `<p>${link(r.link)}</p>` : ""}${r.note ? `<p>${esc(r.note)}</p>` : ""}${r.contact ? `<p>제보자 ${esc(r.contact)}</p>` : ""}
-      <div class="bt">${["ok", "hold", "no"].map(s => `<button data-id="${r.id}" data-st="${s}" class="${r.status === s ? "on" : ""}">${ST[s]}</button>`).join("")}</div>
-    </div>`).join("")}</div>` : `<div class="empty">${repAll ? "아직 제보가 없어요" : "처리할 제보가 없어요"}</div>`}`;
+      <div class="bt">${r.status === "added" ? "" : `<button class="add" data-add="${r.id}">지도에 올리기</button>`}${["ok", "hold", "no"].map(s => `<button data-id="${r.id}" data-st="${s}" class="${r.status === s ? "on" : ""}">${ST[s]}</button>`).join("")}</div>
+    </div>`).join("")}</div>` : `<div class="empty">${repAll ? "아직 제보가 없어요" : "처리할 제보가 없어요"}</div>`}
+    ${ADDED.length ? `<h2 style="margin-top:20px">지도에 올린 가게 <span class="muted">${ADDED.length}곳</span></h2><div class="reps added-list">${ADDED.map(p => `<div class="repi">
+      <div class="h"><b>${esc(p.name)}</b><span class="tg">${esc(MAPS[p.map] || p.map)}</span><span class="tg">${esc(p.area || "")}</span><span class="d">${day(p.created_at)}</span></div>
+      <div class="bt"><button data-del="${p.id}">지도에서 내리기</button></div></div>`).join("")}</div>` : ""}`;
+  box.querySelectorAll("[data-add]").forEach(b => b.onclick = () => openPlace(REP.find(x => x.id === +b.dataset.add)));
+  box.querySelectorAll("[data-del]").forEach(b => b.onclick = async () => {
+    const p = ADDED.find(x => x.id === +b.dataset.del);
+    if (!p || !confirm(`"${p.name}"을(를) 지도에서 내릴까요?`)) return;
+    const { error } = await sb.from("places").delete().eq("id", p.id);
+    if (error) { alert("내리지 못했어요: " + error.message); return; }
+    if (p.report_id) { await sb.from("reports").update({ status: "ok" }).eq("id", p.report_id); const r = REP.find(x => x.id === p.report_id); if (r) r.status = "ok"; }
+    ADDED = ADDED.filter(x => x.id !== p.id); repView();
+  });
   box.querySelectorAll("[data-ra]").forEach(b => b.onclick = () => { repAll = b.dataset.ra === "1"; repView(); });
   box.querySelectorAll("[data-st]").forEach(b => b.onclick = async () => {
     const id = +b.dataset.id, st = b.dataset.st;
@@ -199,6 +234,54 @@ function repView() {
     if (error) { alert("바꾸지 못했어요: " + error.message); return; }
     const r = REP.find(x => x.id === id); if (r) r.status = st; repView();
   });
+}
+
+/* ----- 제보 → 지도에 올리기 ----- */
+let pm = null, pk = null, pPos = null, pRep = null;
+function openPlace(r) {
+  if (!r) return; pRep = r; pPos = null;
+  const isUrl = /^https?:\/\//i.test(r.link || "") || /naver\.me/i.test(r.link || "");
+  const opt = (arr, v) => arr.map(x => `<option ${x === v ? "selected" : ""}>${esc(x)}</option>`).join("");
+  const mapOpt = Object.entries(MAPS).map(([k, l]) => `<option value="${k}" ${k === r.map ? "selected" : ""}>${esc(l)}</option>`).join("");
+  let m = document.getElementById("pmodal");
+  if (!m) { m = document.createElement("div"); m.id = "pmodal"; m.className = "modal"; document.body.appendChild(m); m.onclick = e => { if (e.target === m) closePlace(); }; }
+  m.innerHTML = `<div class="mbox" role="dialog" aria-modal="true" aria-labelledby="pmT">
+    <h2 id="pmT">지도에 올리기</h2>
+    <label>가게 이름<input id="pf_name" value="${esc(r.name)}"></label>
+    <div class="two"><label>지도<select id="pf_map">${mapOpt}</select></label><label>종류<select id="pf_type">${opt(TYPES, r.map === "bangeo" ? "횟집" : "기타")}</select></label></div>
+    <div class="two"><label>구<select id="pf_area"><option value="">선택</option>${opt(GU, GU.find(g => g !== "중구" && ((r.link || "") + " " + (r.note || "")).includes(g)) || "")}</select></label><label>주소<input id="pf_addr" value="${isUrl ? "" : esc(r.link || "")}" placeholder="서울 ○○구 …"></label></div>
+    <label>네이버 지도 링크<input id="pf_naver" value="${isUrl ? esc(r.link) : ""}" placeholder="https://naver.me/…"></label>
+    <label>한 줄 메모<input id="pf_memo" value="${esc(r.note || "")}"></label>
+    <p class="hint">아래 지도에서 가게 위치를 눌러 주세요. 위치가 헷갈리면 <a href="https://map.naver.com/p/search/${encodeURIComponent(r.name)}" target="_blank" rel="noopener">네이버 지도에서 검색</a>해서 확인하세요.</p>
+    <div id="pmap"></div>
+    <div class="row2"><button class="cx" id="pf_cancel">취소</button><button class="save" id="pf_save" disabled>위치를 먼저 찍어 주세요</button></div>
+  </div>`;
+  m.classList.add("open");
+  document.getElementById("pf_cancel").onclick = closePlace;
+  document.getElementById("pf_save").onclick = savePlace;
+  if (!(window.naver && naver.maps && naver.maps.Map)) { document.getElementById("pmap").innerHTML = `<p class="hint" style="padding:16px">지도를 불러오지 못했어요. 새로고침해 주세요.</p>`; return; }
+  pm = new naver.maps.Map("pmap", { center: new naver.maps.LatLng(37.548, 126.99), zoom: 12, zoomControl: true, zoomControlOptions: { position: naver.maps.Position.TOP_RIGHT } });
+  pk = null;
+  naver.maps.Event.addListener(pm, "click", e => {
+    pPos = { lat: +e.coord.lat().toFixed(6), lng: +e.coord.lng().toFixed(6) };
+    if (!pk) pk = new naver.maps.Marker({ position: e.coord, map: pm, icon: { content: '<div class="pk"></div>', anchor: new naver.maps.Point(10, 10) } });
+    else pk.setPosition(e.coord);
+    const s = document.getElementById("pf_save"); s.disabled = false; s.textContent = "지도에 올리기";
+  });
+}
+function closePlace() { const m = document.getElementById("pmodal"); if (m) m.classList.remove("open"); if (pm) { if (pm.destroy) pm.destroy(); pm = null; } }
+async function savePlace() {
+  if (!pPos || !pRep) return;
+  const g = id => document.getElementById(id).value.trim();
+  if (!g("pf_name")) { alert("가게 이름을 넣어 주세요"); return; }
+  const row = { map: g("pf_map"), name: g("pf_name"), type: g("pf_type"), area: g("pf_area"), address: g("pf_addr") || null, naver: g("pf_naver") || null, memo: g("pf_memo") || null, lat: pPos.lat, lng: pPos.lng, report_id: pRep.id };
+  const s = document.getElementById("pf_save"); s.disabled = true; s.textContent = "올리는 중…";
+  const { data: ins, error } = await sb.from("places").insert(row).select().single();
+  if (error) { alert("올리지 못했어요: " + error.message); s.disabled = false; s.textContent = "지도에 올리기"; return; }
+  await sb.from("reports").update({ status: "added" }).eq("id", pRep.id);
+  pRep.status = "added"; ADDED.unshift(ins); ALL = null;
+  closePlace(); repView();
+  alert(`"${ins.name}"을(를) ${MAPS[ins.map] || ins.map} 지도에 올렸어요`);
 }
 
 sb.auth.getSession().then(({ data: { session } }) => session ? load() : loginView());
