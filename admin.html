@@ -252,7 +252,8 @@ function openPlace(r) {
     <div class="two"><label>구<select id="pf_area"><option value="">선택</option>${opt(GU, GU.find(g => g !== "중구" && ((r.link || "") + " " + (r.note || "")).includes(g)) || "")}</select></label><label>주소<input id="pf_addr" value="${isUrl ? "" : esc(r.link || "")}" placeholder="서울 ○○구 …"></label></div>
     <label>네이버 지도 링크<input id="pf_naver" value="${isUrl ? esc(r.link) : ""}" placeholder="https://naver.me/…"></label>
     <label>한 줄 메모<input id="pf_memo" value="${esc(r.note || "")}"></label>
-    <p class="hint">아래 지도에서 가게 위치를 눌러 주세요. 위치가 헷갈리면 <a href="https://map.naver.com/p/search/${encodeURIComponent(r.name)}" target="_blank" rel="noopener">네이버 지도에서 검색</a>해서 확인하세요.</p>
+    <p class="hint" id="pf_status">네이버에서 위치를 찾는 중…</p>
+    <div id="pf_cands" class="reps"></div>
     <div id="pmap"></div>
     <div class="row2"><button class="cx" id="pf_cancel">취소</button><button class="save" id="pf_save" disabled>위치를 먼저 찍어 주세요</button></div>
   </div>`;
@@ -263,11 +264,58 @@ function openPlace(r) {
   pm = new naver.maps.Map("pmap", { center: new naver.maps.LatLng(37.548, 126.99), zoom: 12, zoomControl: true, zoomControlOptions: { position: naver.maps.Position.TOP_RIGHT } });
   pk = null;
   naver.maps.Event.addListener(pm, "click", e => {
-    pPos = { lat: +e.coord.lat().toFixed(6), lng: +e.coord.lng().toFixed(6) };
-    if (!pk) pk = new naver.maps.Marker({ position: e.coord, map: pm, icon: { content: '<div class="pk"></div>', anchor: new naver.maps.Point(10, 10) } });
-    else pk.setPosition(e.coord);
-    const s = document.getElementById("pf_save"); s.disabled = false; s.textContent = "지도에 올리기";
+    setPos(e.coord.lat(), e.coord.lng(), false);
+    document.getElementById("pf_status").textContent = "직접 찍은 위치로 올려요.";
   });
+  lookup(r);
+}
+function setPos(lat, lng, move) {
+  pPos = { lat: +(+lat).toFixed(6), lng: +(+lng).toFixed(6) };
+  const ll = new naver.maps.LatLng(pPos.lat, pPos.lng);
+  if (pm) {
+    if (!pk) pk = new naver.maps.Marker({ position: ll, map: pm, icon: { content: '<div class="pk"></div>', anchor: new naver.maps.Point(10, 10) } });
+    else pk.setPosition(ll);
+    if (move) { pm.setZoom(17); pm.setCenter(ll); }
+  }
+  const s = document.getElementById("pf_save"); s.disabled = false; s.textContent = "지도에 올리기";
+}
+function areaOf(addr) {
+  const t = String(addr || "").split(/\s+/);
+  if (!t[0]) return "";
+  if (!/^서울/.test(t[0])) return "서울 밖";
+  return GU.includes(t[1]) ? t[1] : "";
+}
+function applyPlace(p) {
+  const set = (id, v) => { if (v) document.getElementById(id).value = v; };
+  set("pf_name", p.name); set("pf_addr", p.address);
+  if (p.id) set("pf_naver", `https://map.naver.com/p/entry/place/${p.id}`);
+  const ar = areaOf(p.address); if (ar) document.getElementById("pf_area").value = ar;
+  if (/술집|이자카야|바\b|BAR/i.test(p.category || "")) document.getElementById("pf_type").value = "이자카야·바";
+  else if (/포장마차|포차/.test(p.category || "")) document.getElementById("pf_type").value = "포차";
+  else if (/회|해산물|생선/.test(p.category || "") && document.getElementById("pf_map").value === "bangeo") document.getElementById("pf_type").value = "횟집";
+  setPos(p.lat, p.lng, true);
+  document.getElementById("pf_status").innerHTML = `네이버에서 찾았어요: <b>${esc(p.name || "")}</b> ${esc(p.address || "")}<br>위치가 맞으면 <b>지도에 올리기</b>를 누르세요. 다르면 지도에서 직접 눌러 고칠 수 있어요.`;
+  document.getElementById("pf_cands").innerHTML = "";
+}
+async function lookup(r) {
+  const st = document.getElementById("pf_status");
+  try {
+    const { data, error } = await sb.functions.invoke("naver-place", { body: { url: r.link || "", q: r.name || "" } });
+    if (error || !data) throw error || 0;
+    if (data.place) return applyPlace(data.place);
+    const c = data.candidates || [];
+    if (c.length === 1) return applyPlace(c[0]);
+    if (c.length) {
+      st.textContent = "네이버에서 비슷한 곳을 찾았어요. 맞는 가게를 골라 주세요.";
+      const box = document.getElementById("pf_cands");
+      box.innerHTML = c.map((p, i) => `<div class="repi"><div class="h"><b>${esc(p.name)}</b><span class="tg">${esc((p.category || "").split(",")[0])}</span></div><p>${esc(p.address || "")}</p><div class="bt"><button class="add" data-ci="${i}">이 가게예요</button></div></div>`).join("");
+      box.querySelectorAll("[data-ci]").forEach(b => b.onclick = () => applyPlace(c[+b.dataset.ci]));
+      return;
+    }
+    throw 0;
+  } catch {
+    st.innerHTML = `자동으로 위치를 못 찾았어요. 아래 지도에서 가게 위치를 직접 눌러 주세요. <a href="https://map.naver.com/p/search/${encodeURIComponent(r.name)}" target="_blank" rel="noopener">네이버 지도에서 검색</a>`;
+  }
 }
 function closePlace() { const m = document.getElementById("pmodal"); if (m) m.classList.remove("open"); if (pm) { if (pm.destroy) pm.destroy(); pm = null; } }
 async function savePlace() {
